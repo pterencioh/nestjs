@@ -1,0 +1,127 @@
+//  ATTENTION: It is recommended to check the database documentation in the 'README.md' file of the project, 
+//             where you will find information about the database, trigger functions, constraints, and relationships.
+
+//  DISCLAIMER: Prisma doesn't support constraints. If you encounter any constraint errors, please refer to the comments below,
+//              or check the database information in the 'README.md' file of the project.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// CONSTRAINTS:
+/// 1. total_expenses_is_positive →           Check IF 'total_expenses' >= 0;
+/// 2. total_credit_is_positive →             Check IF 'total_credit_expenses' >= 0;
+model cash_flow {
+  id                    Int      @id @default(autoincrement())
+  balance               Decimal  @default(0.00) @db.Decimal(10, 2)
+  total_expenses        Decimal  @default(0.00) @db.Decimal(10, 2)
+  total_credit_expenses Decimal  @default(0.00) @db.Decimal(10, 2)
+  created_at            DateTime @default(now()) @db.Timestamp(6)
+  updated_at            DateTime @default(now()) @db.Timestamp(6)
+  user_id               Int
+  users                 users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model category {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(20)
+  created_at   DateTime       @default(now()) @db.Timestamp(6)
+  updated_at   DateTime       @default(now()) @db.Timestamp(6)
+  user_id      Int
+  users        users          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  receipt      receipt[]
+  transactions transactions[]
+}
+
+/// CONSTRAINTS:
+/// 1. installment_number_higher_zero  →          Check IF 'installment_number' > 0;
+/// 2. value_is_positive →                        Check IF 'value' >= 0;
+/// 3. validate_paid_date →                       Check IF 'paid' == 'FALSE' AND 'paid_at' == NULL OR
+///                                                     IF 'paid' == 'TRUE' AND 'paid_at' !== NULL;
+model credit_installments {
+  id                 Int          @id @default(autoincrement())
+  installment_number Int
+  month              String       @db.VarChar(40)
+  value              Decimal      @default(0.00) @db.Decimal(10, 2)
+  paid               Boolean      @default(false)
+  paid_at            DateTime?    @db.Timestamp(6)
+  created_at         DateTime     @default(now()) @db.Timestamp(6)
+  updated_at         DateTime     @default(now()) @db.Timestamp(6)
+  transaction_id     Int
+  user_id            Int
+  transactions       transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users              users        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// CONSTRAINTS:
+/// 1. amount_transactions_is_positive →          Check IF 'amount_transactions' >= 0;
+/// 2. total_price_transactions_is_positive →     Check IF 'total_price_transactions' >= 0;
+model receipt {
+  id                       Int            @id @default(autoincrement())
+  url_attachment           String         @db.VarChar(200)
+  receipt_date             DateTime       @db.Timestamp(6)
+  amount_transactions      Int            @default(0)
+  total_price_transactions Decimal        @default(0.00) @db.Decimal(10, 2)
+  created_at               DateTime       @default(now()) @db.Timestamp(6)
+  updated_at               DateTime       @default(now()) @db.Timestamp(6)
+  user_id                  Int
+  category_id              Int?
+  category                 category?      @relation(fields: [category_id], references: [id], onUpdate: NoAction)
+  users                    users          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions             transactions[]
+}
+
+/// CONSTRAINTS:
+/// 1. unit_price_is_positive →           Check IF 'unit_price' >= 0;
+/// 2. amount_is_positive →               Check IF 'amount' >= 0;
+/// 3. total_price_is_positive →          Check IF 'total_price' >= 0;
+/// 4. validate_income_amount →           Check IF 'amount' == 1 WHEN 'transaction_type' == 'income';
+/// 5. validate_total_installments →      Check IF 'total_installments' == 0 WHEN 'transaction_type' == 'debit,income' OR
+///                                             IF 'total_installments' > 0 WHEN 'transaction_type' == 'credit';
+/// 6. validate_receipt_id →              Check IF 'has_receipt' == 'TRUE' AND 'receipt_id' !== NULL OR
+///                                             IF 'has_receipt' == 'FALSE' AND 'receipt_id' == NULL;
+model transactions {
+  id                  Int                   @id @default(autoincrement())
+  description         String                @db.VarChar(20)
+  unit_price          Decimal               @db.Decimal(10, 2)
+  amount              Int
+  total_price         Decimal               @default(0.00) @db.Decimal(10, 2)
+  transaction_type    transactiontype
+  total_installments  Int                   @default(0)
+  installments_paid   Boolean               @default(false)
+  has_receipt         Boolean               @default(false)
+  created_at          DateTime              @default(now()) @db.Timestamp(6)
+  updated_at          DateTime              @default(now()) @db.Timestamp(6)
+  receipt_id          Int?
+  category_id         Int?
+  user_id             Int
+  credit_installments credit_installments[]
+  category            category?             @relation(fields: [category_id], references: [id], onUpdate: NoAction)
+  receipt             receipt?              @relation(fields: [receipt_id], references: [id], onUpdate: NoAction)
+  users               users                 @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id                  Int                   @id @default(autoincrement())
+  name                String                @db.VarChar(100)
+  email               String                @db.VarChar(40)
+  password            String                @db.VarChar(40)
+  created_at          DateTime              @default(now()) @db.Timestamp(6)
+  last_login_at       DateTime              @default(now()) @db.Timestamp(6)
+  cash_flow           cash_flow[]
+  category            category[]
+  credit_installments credit_installments[]
+  receipt             receipt[]
+  transactions        transactions[]
+}
+
+enum transactiontype {
+  debit
+  credit
+  income
+}
