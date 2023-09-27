@@ -1,12 +1,21 @@
+- [Database Structure](#database-structure)
+- [Tables Additional Information](#tables-additional-information)
+    - [Users](#users)
+    - [Category](#category)
+    - [Cash Flow](#cash-flow)
+    - [Transactions](#transactions)
+    - [Receipt](#receipt)
+    - [Credit Installments](#credit-installments)
+
 # Database Structure
 ![control_financial_db](https://github.com/pterencioh/nestjs/assets/107655462/e9c8d73c-a030-402c-95ae-fab5eedf9d8b)
 
-# Trigger Functions
+# Tables Additional Information
 
 ### Users
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (users)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -25,7 +34,7 @@
 ### Category
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (category)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -45,7 +54,7 @@
 ### Cash Flow
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (cash_flow)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -61,11 +70,28 @@
   </tr>
 </table>
 
+<table border="1">
+  <tr>
+      <th colspan="2">Constraints</th>
+  </tr>
+  <tr>
+      <th>Name</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+      <td>total_expenses_is_positive</td>
+      <td>Check IF 'total_expenses' >= 0</td>
+  </tr>
+  <tr>
+      <td>total_credit_is_positive</td>
+      <td>Check IF 'total_credit_expenses' >= 0</td>
+  </tr>
+</table>
 
 ### Transactions
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (transactions)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -144,11 +170,45 @@ Balance = Total Income - (Total Debits + Total Credits Paid).</td>
   </tr>
 </table>
 
+<table border="1">
+  <tr>
+      <th colspan="2">Constraints</th>
+  </tr>
+  <tr>
+      <th>Name</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+      <td>unit_price_is_positive</td>
+      <td>Check IF 'unit_price' >= 0</td>
+  </tr>
+  <tr>
+      <td>amount_is_positive</td>
+      <td>Check IF 'amount' >= 0</td>
+  </tr>
+  <tr>
+      <td>total_price_is_positive</td>
+      <td>Check IF 'total_price' >= 0</td>
+  </tr>
+  <tr>
+      <td>validate_income_amount</td>
+      <td>Check IF 'amount' == 1 WHEN 'transaction_type' == 'income'</td>
+  </tr>
+  <tr>
+      <td>validate_total_installments</td>
+      <td>Check IF 'total_installments' == 0 WHEN 'transaction_type' == 'debit,income' OR <br>IF 'total_installments' > 0 WHEN 'transaction_type' == 'credit'</td>
+  </tr>
+  <tr>
+      <td>validate_receipt_id</td>
+      <td>Check IF 'has_receipt' == 'TRUE' AND 'receipt_id' !== NULL OR
+      <br>IF 'has_receipt' == 'FALSE' AND 'receipt_id' == NULL</td>
+  </tr>
+</table>
 
 ### Receipt
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (receipt)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -164,11 +224,28 @@ Balance = Total Income - (Total Debits + Total Credits Paid).</td>
   </tr>
 </table>
 
+<table border="1">
+  <tr>
+      <th colspan="2">Constraints</th>
+  </tr>
+  <tr>
+      <th>Name</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+      <td>amount_transactions_is_positive</td>
+      <td>Check IF 'amount_transactions' >= 0</td>
+  </tr>
+  <tr>
+      <td>total_price_transactions_is_positive</td>
+      <td>Check IF 'total_price_transactions' >= 0</td>
+  </tr>
+</table>
 
 ### Credit Installments
 <table border="1">
   <tr>
-      <th colspan="4">Trigger Functions (credit_installments)</th>
+      <th colspan="4">Trigger Functions</th>
   </tr>
   <tr>
       <th>Name</th>
@@ -187,5 +264,28 @@ Balance = Total Income - (Total Debits + Total Credits Paid).</td>
       <td>After an installment is paid, the function checks whether all installments related to that transaction are also paid. If they are, it will <b>UPDATE</b> the 'installments_paid' column of the transaction to <b>TRUE</b>.</td>
       <td><b>AFTER</b></td>
       <td><b>UPDATE</b></td>
+  </tr>
+</table>
+
+<table border="1">
+  <tr>
+      <th colspan="2">Constraints</th>
+  </tr>
+  <tr>
+      <th>Name</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+      <td>installment_number_higher_zero</td>
+      <td>Check IF 'installment_number' > 0</td>
+  </tr>
+  <tr>
+      <td>value_is_positive</td>
+      <td>Check IF 'value' >= 0</td>
+  </tr>
+  <tr>
+      <td>validate_paid_date</td>
+      <td>Check IF 'paid' == 'FALSE' AND 'paid_at' == NULL OR
+      <br>IF 'paid' == 'TRUE' AND 'paid_at' !== NULL</td>
   </tr>
 </table>
