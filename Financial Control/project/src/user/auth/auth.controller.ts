@@ -1,19 +1,24 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { SignupDto } from '../dtos/auth.dto';
+import { Controller, Post, Get, Body, Param, ParseEnumPipe } from '@nestjs/common';
+import { AuthService, GoogleTypes } from './auth.service';
+import { GoogleDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { created_types } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @Post('/:type/signup')
-    signup(@Body() body: SignupDto, @Param('type') type : created_types){
-        return this.authService.signup(body, type);
+    @Post('/signup')
+    signup(@Body() body: SignupDto) {
+        return this.authService.signup(body);
     }
 
-    @Get('/signin')
-    signin(){
-        return this.authService.signin();
+    @Post('/signin')
+    signin(@Body() body: SigninDto) {
+        return this.authService.signin(body);
+    }
+
+    @Post('/google/:typeAccess')
+    googleAccess(@Body() body: GoogleDto, @Param('typeAccess', new ParseEnumPipe(GoogleTypes)) type: GoogleTypes) {
+        return this.authService.googleAccess(body, type);
     }
 }

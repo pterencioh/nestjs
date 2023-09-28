@@ -1,15 +1,28 @@
 import { IsString, IsNotEmpty, IsEmail, MinLength } from "class-validator";
 
 export class SignupDto {
-
     @IsString()
     @IsNotEmpty()
-    name: String;
+    name: string;
 
     @IsEmail()
-    email: String;
+    email: string;
 
     @IsString()
     @MinLength(5)
-    password: String;
+    password: string;
+}
+
+export class SigninDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    password: string;
+}
+
+export class GoogleDto {
+    @IsString()
+    @IsNotEmpty()
+    jwt: string;
 }
