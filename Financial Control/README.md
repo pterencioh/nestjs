@@ -8,7 +8,7 @@
     - [Credit Installments](#credit-installments)
 
 # Database Structure
-![control_financial_db](https://github.com/pterencioh/nestjs/assets/107655462/e9c8d73c-a030-402c-95ae-fab5eedf9d8b)
+![control_financial_db](https://github.com/pterencioh/nestjs/assets/107655462/d2ac00f8-05a7-433e-888d-2be00292ef7f)
 
 # Tables Additional Information
 
@@ -30,6 +30,21 @@
       <td><b>INSERT</b></td>
   </tr>
 </table>
+
+<table border="1">
+  <tr>
+      <th colspan="2">Constraints</th>
+  </tr>
+  <tr>
+      <th>Name</th>
+      <th>Description</th>
+  </tr>
+  <tr>
+      <td>email_unique</td>
+      <td>Check IF 'email' is unique.</td>
+  </tr>
+</table>
+
 
 ### Category
 <table border="1">
