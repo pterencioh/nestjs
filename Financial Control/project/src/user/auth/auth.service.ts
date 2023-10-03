@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { GoogleDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { created_types } from '@prisma/client';

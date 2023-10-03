@@ -18,7 +18,9 @@ export class AuthController {
     }
 
     @Post('/google/:typeAccess')
-    googleAccess(@Body() body: GoogleDto, @Param('typeAccess', new ParseEnumPipe(GoogleTypes)) type: GoogleTypes) {
+    googleAccess(
+        @Body() body: GoogleDto,
+        @Param('typeAccess', new ParseEnumPipe(GoogleTypes)) type: GoogleTypes) {
         return this.authService.googleAccess(body, type);
     }
 }
