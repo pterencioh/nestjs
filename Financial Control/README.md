@@ -146,7 +146,7 @@ For example: If the 'Total Installments' is three and today's month is November,
   </tr>
   <tr>
       <td>disable_update_credit()</td>
-      <td>For records where the transaction type is 'credit,' the function will prevent the <b>UPDATE</b> operation if the user is attempting to update the columns 'unit_price,' 'amount,' 'total_price,' or 'total_installments.'</td>
+      <td>For records where the transaction type is 'credit,' the function will prevent the <b>UPDATE</b> operation if the user is attempting to update the columns 'unit_price,' 'amount,' 'total_price,' or 'total_installments'</td>
       <td align="center"><b>BEFORE</b></td>
       <td align="center"><b>UPDATE</b></td>
   </tr>
