@@ -102,3 +102,9 @@ export class UpdateDebitIncomeDto extends DefaultUpdateDto {
     @Max(99)
     amount?: number;
 }
+
+export class DeleteDto {
+    @IsInt()
+    @IsNotEmpty()
+    user_id: number;
+}

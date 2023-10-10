@@ -1,7 +1,8 @@
-import { Body, Controller, Param, ParseEnumPipe, ParseIntPipe, Post, Put } from '@nestjs/common';
-import { DebitIncomeType, TransactionsService } from './transactions.service';
-import { CreditDto, DebitDto, DefaultUpdateDto, IncomeDto, UpdateDebitIncomeDto } from '../dtos/financial.dto';
-import { type } from 'os';
+import { Body, Controller, Param, ParseIntPipe, Post, Put, Delete } from '@nestjs/common';
+import { TransactionsService } from './transactions.service';
+import { CreditDto, DebitDto, DefaultUpdateDto, DeleteDto, IncomeDto, UpdateDebitIncomeDto } from '../dtos/financial.dto';
+import { User } from 'src/user/decorators/user.decorator';
+import { UserInfo } from 'src/user/decorators/user.decorator';
 
 @Controller('transactions')
 export class TransactionsController {
@@ -28,19 +29,35 @@ export class TransactionsController {
 
 
     //UPDATE
-    @Put('/:type/:id')
-    updateTransaction(
+    @Put('/debit/:id')
+    updateDebitTransaction(
         @Body() body : UpdateDebitIncomeDto,
-        @Param("type", new ParseEnumPipe(DebitIncomeType)) type : DebitIncomeType,
-        @Param("id", new ParseIntPipe()) id : number){
-        return this.transactionService.updateTransaction(body, id);
+        @Param("id", new ParseIntPipe()) id : number,
+        @User() user : UserInfo){
+            return user;
+       /*  return this.transactionService.updateTransaction(body, id, 'debit'); */
     }
 
     @Put('/credit/:id')
     updateCreditTransaction(
         @Body() body : DefaultUpdateDto,
         @Param("id", new ParseIntPipe()) id : number){
-        return this.transactionService.updateTransaction(body, id);
+        return this.transactionService.updateTransaction(body, id, 'credit');
+    }
+
+    @Put('/income/:id')
+    updateIncomeTransaction(
+        @Body() body : UpdateDebitIncomeDto,
+        @Param("id", new ParseIntPipe()) id : number){
+        return this.transactionService.updateTransaction(body, id, 'income');
+    }
+
+    //DELETE
+    @Delete(':id')
+    deleteTransaction(
+        @Body() body : DeleteDto,
+        @Param("id", new ParseIntPipe()) id : number){
+            return this.transactionService.deleteTransaction(body.user_id ,id);
     }
 
 }
