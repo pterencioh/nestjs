@@ -23,10 +23,6 @@ class DefaultTransactionDto {
     @IsOptional()
     @IsInt()
     category_id?: number = null;
-
-    @IsInt()
-    @IsNotEmpty()
-    user_id: number;
 }
 
 export class DebitDto extends DefaultTransactionDto {
@@ -81,9 +77,6 @@ export class DefaultUpdateDto {
     @IsInt()
     category_id?: number;
 
-    @IsInt()
-    @IsNotEmpty()
-    user_id: number;
 }
 
 export class UpdateDebitIncomeDto extends DefaultUpdateDto {
@@ -101,10 +94,4 @@ export class UpdateDebitIncomeDto extends DefaultUpdateDto {
     @Min(1)
     @Max(99)
     amount?: number;
-}
-
-export class DeleteDto {
-    @IsInt()
-    @IsNotEmpty()
-    user_id: number;
 }

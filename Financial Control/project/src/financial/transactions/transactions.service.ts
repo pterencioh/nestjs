@@ -2,6 +2,7 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreditDto, DebitDto, DefaultUpdateDto, IncomeDto, UpdateDebitIncomeDto } from '../dtos/financial.dto';
 import { transaction_types } from '@prisma/client';
+import { UserInfo } from 'src/user/decorators/user.decorator';
 
 interface TablesID {
     userID: number,
@@ -18,10 +19,10 @@ export enum DebitIncomeType {
 @Injectable()
 export class TransactionsService {
     constructor(private readonly prismaService: PrismaService) { }
-    async addTransaction(body: DebitDto | CreditDto | IncomeDto, type: transaction_types) {
+    async addTransaction(user: UserInfo, body: DebitDto | CreditDto | IncomeDto, type: transaction_types) {
         try {
             const objIDs = {
-                userID: body.user_id,
+                userID: user.id,
                 receiptID: body.receipt_id,
                 categoryID: body.category_id
             }
@@ -37,8 +38,9 @@ export class TransactionsService {
 
             return this.prismaService.transactions.create({
                 data: {
+                    user_id: user.id,
+                    transaction_type: type,
                     ...body,
-                    transaction_type: type
                 }
             })
 
@@ -47,10 +49,10 @@ export class TransactionsService {
         }
     }
 
-    async updateTransaction(body: UpdateDebitIncomeDto | DefaultUpdateDto, id: number, type: transaction_types) {
+    async updateTransaction(user: UserInfo, body: UpdateDebitIncomeDto | DefaultUpdateDto, id: number, type: transaction_types) {
         try {
             const objIDs = {
-                userID: body.user_id,
+                userID: user.id,
                 transactionID: id,
                 receiptID: body.receipt_id,
                 categoryID: body.category_id
@@ -62,7 +64,7 @@ export class TransactionsService {
             const transaction = await this.prismaService.transactions.findUnique({
                 where: {
                     id,
-                    user_id: body.user_id,
+                    user_id: user.id,
                     transaction_type: type
                 }
             });
@@ -73,7 +75,7 @@ export class TransactionsService {
             return await this.prismaService.transactions.update({
                 where: {
                     id,
-                    user_id: body.user_id,
+                    user_id: user.id,
                     transaction_type: type
                 },
                 data: {
@@ -86,12 +88,12 @@ export class TransactionsService {
 
     }
 
-    async deleteTransaction(userID: number, id: number) {
+    async deleteTransaction(user: UserInfo, id: number) {
         try {
             const transaction = await this.prismaService.transactions.findUnique({
                 where: {
                     id,
-                    user_id: userID
+                    user_id: user.id
                 }
             });
             
@@ -109,6 +111,12 @@ export class TransactionsService {
     }
 
     private validateReceipt(hasReceipt: boolean, receiptID: number) {
+        const allEmpty = ((hasReceipt === undefined || hasReceipt === null) &&
+                          (receiptID === undefined || receiptID === null));
+        
+        if (allEmpty)
+            return
+
         const checkTrue = (hasReceipt === true && receiptID !== null);
         const checkFalse = (hasReceipt === false && receiptID === null);
 
@@ -128,13 +136,16 @@ export class TransactionsService {
     }
 
     private async validateIDs({ userID, receiptID, categoryID, transactionID }: TablesID) {
-        const allNull = (receiptID === null && categoryID === null && transactionID === null);
-        if (allNull)
+        const allEmpty = ((receiptID === undefined || receiptID === null) &&
+                             (categoryID === undefined || categoryID === null) && 
+                             (transactionID === undefined || transactionID === null));
+
+        if (allEmpty)
             return
 
-        const isReceiptNotEmpty = (receiptID !== null);
-        const isCategoryNotEmpty = (categoryID !== null);
-        const isTransactionNotEmpty = (transactionID !== null);
+        const isReceiptNotEmpty = (receiptID !== undefined);
+        const isCategoryNotEmpty = (categoryID !== undefined);
+        const isTransactionNotEmpty = (transactionID !== undefined);
 
         if (isReceiptNotEmpty) {
             const receipt = await this.getReceiptByID(receiptID, userID);
