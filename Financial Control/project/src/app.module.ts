@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import * as express from 'express';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -15,4 +16,11 @@ import { UserInterceptor } from './user/interceptors/user.interceptor';
     useClass: UserInterceptor
   }],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(express.static('public')) // 'public' é o diretório onde seus arquivos HTML estão localizados
+      .forRoutes({ path: '/', method: RequestMethod.ALL });
+  }
+}

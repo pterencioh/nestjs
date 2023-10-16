@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsPositive, IsNumber, Max, Matches, IsOptional, IsBoolean, IsInt, Min } from "class-validator";
+import { IsString, IsNotEmpty, IsPositive, IsNumber, Max, Matches, IsOptional, IsBoolean, IsInt, Min, MaxLength, MinLength, IsDate } from "class-validator";
 
 class DefaultTransactionDto {
     @IsString()
@@ -94,4 +94,50 @@ export class UpdateDebitIncomeDto extends DefaultUpdateDto {
     @Min(1)
     @Max(99)
     amount?: number;
+}
+
+export class CategoryDto {
+    @MaxLength(20)
+    @MinLength(3)
+    @IsNotEmpty()
+    @IsString()
+    name: string;
+}
+
+export class ReceiptDto {
+    @MaxLength(200)
+    @MinLength(10)
+    @IsNotEmpty()
+    @Matches(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, {
+        message: "URL not valid, tip: URL needs the 'https://'"
+    })
+    @IsString()
+    url_attachment: string;
+
+    @IsNotEmpty()
+    @IsDate()
+    receipt_date: Date;
+
+    @IsOptional()
+    @IsInt()
+    category_id?: number;
+}
+
+export class UpdateReceiptDto {
+    @MaxLength(200)
+    @MinLength(10)
+    @IsOptional()
+    @Matches(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, {
+        message: "URL not valid, tip: URL needs the 'https://'"
+    })
+    @IsString()
+    url_attachment?: string;
+
+    @IsOptional()
+    @IsDate()
+    receipt_date?: Date;
+
+    @IsOptional()
+    @IsInt()
+    category_id?: number;
 }

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create your account</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script type="module" src="./js/signup.js" defer></script>
+    <link rel="icon" type="image/x-icon" href="./img/logo-icon.png" />
+    <script src="https://accounts.google.com/gsi/client" async></script>
+</head>
+
+<body>
+    <div class="centered-div">
+        <a href="/"><img src="./img/logo.png" alt="Login" id="logo"></a>
+        <div class="sign-up">
+            <label for="logo">Let's create your account!</label>
+        </div>
+
+        <div class="name">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" placeholder="Fill in your name." />
+        </div>
+
+        <div class="username">
+            <label for="username">Email</label>
+            <input type="username" name="username" id="username" placeholder="This will be your username." />
+        </div>
+
+        <div class="password">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Fill in your password." />
+        </div>
+
+        <div class="showPassword">
+            <a href="#" id="showPassword">Show password</a>
+        </div>
+
+        <div class="confirmPassword">
+            <label for="confirmPassword">Repeat Password</label>
+            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm your password." />
+        </div>
+
+        <div class="showConfirmPassword">
+            <a href="#" id="showConfirmPassword">Show password</a>
+        </div>
+
+        <button type="submit" id="signup" disabled>Sign up</button>
+        <hr>
+
+        <div id="g_id_onload" data-client_id="750160948383-jkbhb3jq0t8vthqadr8s22s0cpf5pkq9.apps.googleusercontent.com"
+            data-context="signup" data-ux_mode="popup" data-callback="setGoogleLogin" data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"
+            data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="400">
+        </div>
+    </div>
+
+</body>
+
+<script>
+    
+    const hasErrorMessage = (type) => {
+        const element = document.getElementById(`error_${type}`);
+        return (element != undefined);
+    };
+    
+    const addErrorMessage = (mainDiv, beforeElement, type, errorMessage) => {
+        let newElement = document.createElement("p");
+        newElement.classList.add("errorMessage");
+        newElement.setAttribute("id", `error_${type}`);
+        newElement.innerText = errorMessage;
+    
+        mainDiv.insertBefore(newElement, beforeElement);
+    };
+    
+    window.setGoogleLogin = (response) => {
+        const configAPI = {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jwt: response.credential
+            })
+        };
+    
+        fetch('/signupGoogle', configAPI)
+            .then(response => { return response.json() })
+            .then(responseJSON => {
+                if (!responseJSON.answer) {
+                    const hasGoogleError = hasErrorMessage("google");
+    
+                    if (hasGoogleError)
+                        return
+                    const mainDiv = document.getElementsByClassName("centered-div")[0];
+                    const signupElement = document.getElementById("signup");
+                    const errorMessage = "Sorry, but your Google account is already registered in the system.";
+                    addErrorMessage(mainDiv, signupElement, "google", errorMessage);
+                    return
+                }
+    
+                const name = responseJSON.data.jwt.name;
+                const avatar = responseJSON.data.jwt.picture;
+    
+                sessionStorage.setItem("name", name);
+                sessionStorage.setItem("avatar", avatar);
+                sessionStorage.setItem("loginType", "google");
+    
+                window.open("/perfil", "_self")
+            })
+            .catch(error => console.log(error))
+    }
+    
+    
+</script>
+</html>

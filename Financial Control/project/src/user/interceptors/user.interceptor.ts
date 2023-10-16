@@ -1,13 +1,18 @@
-import { CallHandler, NestInterceptor, ExecutionContext } from "@nestjs/common";
+import { CallHandler, NestInterceptor, ExecutionContext, HttpException } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
 
 export class UserInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, handler: CallHandler){
-        const request = context.switchToHttp().getRequest();
-        const token = request?.headers?.authorization?.split('Bearer ')[1];
-        const user = jwt.decode(token)
+        try {
+            const request = context.switchToHttp().getRequest();
+            const token = request?.headers?.authorization?.split('Bearer ')[1];
+            const user = jwt.decode(token)
+    
+            request.user = user;
+            return handler.handle();
+        } catch (error) {
+            throw new HttpException("Invalid JWT Token", 400);
+        }
 
-        request.user = user;
-        return handler.handle();
     }
 }

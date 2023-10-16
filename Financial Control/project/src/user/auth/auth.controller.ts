@@ -3,7 +3,7 @@ import { AuthService, GoogleTypes } from './auth.service';
 import { GoogleDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { created_types } from '@prisma/client';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 

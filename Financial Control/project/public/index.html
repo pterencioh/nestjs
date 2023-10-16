@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="./js/index.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" type="image/x-icon" href="./img/logo-icon.png" />
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="centered-div">
+        <a href="/"><img src="./img/logo.png" alt="Login" id="logo"></a>
+        <div class="sign-up">
+            <label for="logo">Don't have an account? <a href="/signup">Sign up</a></label>
+        </div>
+
+        <div class="username">
+            <label for="email">Email address</label>
+            <input type="email" name="email" id="email" required placeholder="Fill in your username." />
+        </div>
+
+        <div class="password">
+            <label for="password">Password</label>
+            <label for="showPassword"></label>
+            <input type="password" name="password" id="password" required placeholder="Fill in your password." />
+        </div>
+
+        <div class="options">
+            <a href="#" id="showPassword">Show password</a>
+            <a href="/forgot" id="forgotPassword">Forgot my password</a>
+        </div>
+
+        <div class="remember">
+            <input type="checkbox" name="rememberMe" id="rememberMe"> Remember me </input>
+        </div>
+
+        <button type="submit" id="login" disabled>Log in</button>
+        <hr>
+
+        <div id="g_id_onload" data-client_id="750160948383-jkbhb3jq0t8vthqadr8s22s0cpf5pkq9.apps.googleusercontent.com"
+            data-context="signin" data-ux_mode="popup" data-callback="sendGoogleLogin" data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"
+            data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="400">
+        </div>
+
+    </div>
+</body>
+
+<script>
+    
+const hasErrorMessage = (type) => {
+    const element = document.getElementById(`error_${type}`);
+    return (element != undefined);
+};
+
+const addErrorMessage = (mainDiv, beforeElement, type, errorMessage) => {
+    let newElement = document.createElement("p");
+    newElement.classList.add("errorMessage");
+    newElement.setAttribute("id", `error_${type}`);
+    newElement.innerText = errorMessage;
+
+    mainDiv.insertBefore(newElement, beforeElement);
+};
+
+window.sendGoogleLogin = (response) => {
+
+    const configAPI = {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            jwt: response.credential
+        })
+    };
+
+    console.log(JSON.stringify({
+            jwt: response.credential
+        }))
+    fetch('/google', configAPI)
+        .then(response => { return response.json() })
+        .then(responseJSON => {
+            if (!responseJSON.answer) {
+                const hasGoogleError = hasErrorMessage("google");
+
+                if (hasGoogleError)
+                    return
+                const mainDiv = document.getElementsByClassName("centered-div")[0];
+                const loginElement = document.getElementById("login");
+                const errorMessage = "Sorry, but your Google account is not registered in the system, please register using the 'sign up' link.";
+                addErrorMessage(mainDiv, loginElement, "google", errorMessage);
+                return
+            }
+
+            const name = responseJSON.data.jwt.name;
+            const avatar = responseJSON.data.jwt.picture;
+
+            sessionStorage.setItem("name", name);
+            sessionStorage.setItem("avatar", avatar);
+            sessionStorage.setItem("loginType", "google");
+
+            /* window.open("/perfil", "_self") */
+        })
+        .catch(error => console.log(error))
+}
+
+
+</script>
+</html>
