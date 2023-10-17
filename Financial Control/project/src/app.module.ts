@@ -8,6 +8,7 @@ import { FinancialModule } from './financial/financial.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UserInterceptor } from './user/interceptors/user.interceptor';
 
+
 @Module({
   imports: [UserModule, PrismaModule, FinancialModule],
   controllers: [AppController],
