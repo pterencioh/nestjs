@@ -5,8 +5,9 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { FinancialModule } from './financial/financial.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { UserInterceptor } from './user/interceptors/user.interceptor';
+import { AuthGuard } from './guards/auth.guard';
 
 
 @Module({
@@ -15,6 +16,9 @@ import { UserInterceptor } from './user/interceptors/user.interceptor';
   providers: [AppService, {
     provide: APP_INTERCEPTOR,
     useClass: UserInterceptor
+  },{
+    provide: APP_GUARD,
+    useClass: AuthGuard
   }],
 })
 

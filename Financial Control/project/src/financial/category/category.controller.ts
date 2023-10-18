@@ -11,16 +11,20 @@ import {
 import { CategoryService } from './category.service';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
 import { CategoryDto } from '../dtos/financial.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { user_roles } from '@prisma/client';
 
 @Controller('api/category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @Roles(user_roles.user)
   @Get()
   getUserCategories(@User() user: UserInfo) {
     return this.categoryService.getUserCategories(user.id);
   }
 
+  @Roles(user_roles.user)
   @Get(':id')
   getCategoryByID(
     @User() user: UserInfo,
@@ -29,11 +33,13 @@ export class CategoryController {
     return this.categoryService.getCategoryByID(user.id, id);
   }
 
+  @Roles(user_roles.user)
   @Post()
   addCategory(@User() user: UserInfo, @Body() body: CategoryDto) {
     return this.categoryService.addCategory(user.id, body);
   }
 
+  @Roles(user_roles.user)
   @Put(':id')
   updateCategory(
     @User() user: UserInfo,
@@ -42,7 +48,8 @@ export class CategoryController {
   ) {
     return this.categoryService.updateCategory(user.id, id, body);
   }
-
+  
+  @Roles(user_roles.user)
   @Delete(':id')
   deleteCategory(
     @User() user: UserInfo,

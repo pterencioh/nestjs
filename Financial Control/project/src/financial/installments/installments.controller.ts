@@ -10,11 +10,14 @@ import {
 import { InstallmentsService } from './installments.service';
 import { User, UserInfo } from 'src/user/decorators/user.decorator';
 import { InstallmentsDto } from '../dtos/financial.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { user_roles } from '@prisma/client';
 
 @Controller('api/installments')
 export class InstallmentsController {
   constructor(private readonly installmentsService: InstallmentsService) {}
 
+  @Roles(user_roles.user)
   @Get('transaction/:id')
   getTransactionInstallments(
     @User() user: UserInfo,
@@ -25,7 +28,8 @@ export class InstallmentsController {
       transactionID,
     );
   }
-
+  
+  @Roles(user_roles.user)
   @Put(':id')
   updateInstallment(
     @User() user: UserInfo,

@@ -20,12 +20,14 @@ import {
 } from '../dtos/financial.dto';
 import { User } from 'src/user/decorators/user.decorator';
 import { UserInfo } from 'src/user/decorators/user.decorator';
-import { transaction_types } from '@prisma/client';
+import { transaction_types, user_roles } from '@prisma/client';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('api/transactions')
 export class TransactionsController {
   constructor(private readonly transactionService: TransactionsService) {}
 
+  @Roles(user_roles.user)
   @Get(':id')
   getTransactionByID(
     @User() user: UserInfo,
@@ -34,11 +36,13 @@ export class TransactionsController {
     return this.transactionService.getTransactionByID(transactionID, user.id);
   }
 
+  @Roles(user_roles.user)
   @Get()
   getTransactions(@User() user: UserInfo) {
     return this.transactionService.getTransactions(user.id);
   }
 
+  @Roles(user_roles.user)
   @Post('/debit')
   addDebitTransaction(@User() user: UserInfo, @Body() body: DebitDto) {
     return this.transactionService.addTransaction(
@@ -48,6 +52,7 @@ export class TransactionsController {
     );
   }
 
+  @Roles(user_roles.user)
   @Post('/credit')
   addCreditTransaction(@User() user: UserInfo, @Body() body: CreditDto) {
     return this.transactionService.addTransaction(
@@ -57,6 +62,7 @@ export class TransactionsController {
     );
   }
 
+  @Roles(user_roles.user)
   @Post('/income')
   addIncomeTransaction(@User() user: UserInfo, @Body() body: IncomeDto) {
     return this.transactionService.addTransaction(
@@ -66,6 +72,7 @@ export class TransactionsController {
     );
   }
 
+  @Roles(user_roles.user)
   @Put('/debit/:id')
   updateDebitTransaction(
     @User() user: UserInfo,
@@ -84,6 +91,7 @@ export class TransactionsController {
     );
   }
 
+  @Roles(user_roles.user)
   @Put('/credit/:id')
   updateCreditTransaction(
     @User() user: UserInfo,
@@ -101,6 +109,7 @@ export class TransactionsController {
     );
   }
 
+  @Roles(user_roles.user)
   @Put('/income/:id')
   updateIncomeTransaction(
     @User() user: UserInfo,
@@ -117,7 +126,8 @@ export class TransactionsController {
       transaction_types.income,
     );
   }
-
+  
+  @Roles(user_roles.user)
   @Delete(':id')
   deleteTransaction(
     @User() user: UserInfo,
