@@ -1,79 +1,87 @@
+import { ErrorTypes }  from "./utils/errorUtils";
 import {
-    checkRememberMe, isValidEmail, checkLoginButton,
+    isValidEmail, checkLoginButton,
     addErrorBorder, hasErrorBorder, addErrorMessage,
-    setError, removeErrors, hasErrorMessage
-} from "./utils/utils.js";
+    setError, removeErrors
+} from "./utils/utils";
+
+interface ConfigAPI {
+    method: string,
+    headers: {
+        "Content-Type": string
+    },
+    body: string
+}
 
 checkLocalStorage();
 
-const showPasswordElement = <HTMLAnchorElement>document.getElementById("showPassword");
+const showPasswordElement = document.getElementById("showPassword") as HTMLAnchorElement;
 showPasswordElement.addEventListener("click", showPassword);
 
-const emailElement = <HTMLInputElement>document.getElementById("email");
+const emailElement = document.getElementById("email") as HTMLInputElement;
 emailElement.addEventListener("change", validateEmail);
 
-const passwordElement = <HTMLInputElement>document.getElementById("password");
+const passwordElement = document.getElementById("password") as HTMLInputElement;
 passwordElement.addEventListener("change", validateForm);
 
-const loginElement = <HTMLButtonElement>document.getElementById("login");
+const loginElement = document.getElementById("login") as HTMLButtonElement;
 loginElement.addEventListener("click", validateLogin);
 
-const mainDiv = <HTMLDivElement>document.getElementsByClassName("centered-div")[0];
+const centeredDiv = document.getElementsByClassName("centered-div")[0] as HTMLDivElement;
 
 
-function showPassword() {
-    const inputPassword = document.getElementById("password");
-    let inputType = inputPassword.getAttribute("type");
+function showPassword(): void {
+    const inputPassword = document.getElementById("password") as HTMLInputElement;
+    let inputType: string = inputPassword.getAttribute("type");
 
     inputType = inputType === 'password' ? 'text' : 'password';
     inputPassword.setAttribute("type", inputType);
 }
-
-function validateEmail() {
-    const isValidValue = isValidEmail(emailElement.value);
+function validateEmail(): void {
+    const isValidValue: boolean = isValidEmail(emailElement.value);
 
     if (!isValidValue) {
-        const errorMessage = "Please provide a valid email. i.e. 'example@example.com'";
-        const beforeElement = document.getElementsByClassName("password")[0];
-        setError(emailElement, mainDiv, beforeElement, "email", errorMessage);
-        return
+        const errorMessage: string = "Please provide a valid email. i.e. 'example@example.com'";
+        const nextElement = document.getElementsByClassName("password")[0] as HTMLDivElement;
+        setError(emailElement, centeredDiv, nextElement, ErrorTypes.email, errorMessage);
+        return;
     }
 
-    const hasBorderError = emailElement.style.borderColor == "red";
+    const hasBorderError: boolean = (emailElement.style.borderColor === "red");
     if (hasBorderError)
-        removeErrors(emailElement, "email");
+        removeErrors(emailElement, ErrorTypes.email);
 
-    checkLoginButton(passwordElement, emailElement, "login");
+    checkLoginButton(passwordElement, emailElement, loginElement.id);
 }
 
-function validateForm() {
-    const isPasswordFilled = (passwordElement.value !== "");
-    const hasPasswordError = (passwordElement.style.borderColor == "red");
+function validateForm(): void {
+    const isPasswordFilled: boolean = (passwordElement.value !== "");
+    const hasPasswordError: boolean = (passwordElement.style.borderColor == "red");
 
     if (!isPasswordFilled) {
-        const errorMessage = "Please fill in the password field."
-        const beforeElement = document.getElementsByClassName("options")[0];
-        setError(passwordElement, mainDiv, beforeElement, "password", errorMessage)
-        return
+        const errorMessage: string = "Please fill in the password field.";
+        const nextElement = document.getElementsByClassName("options")[0] as HTMLDivElement;
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
+        return;
     }
 
     if (isPasswordFilled && hasPasswordError)
-        removeErrors(passwordElement, "password");
+        removeErrors(passwordElement, ErrorTypes.password);
 
-    const isEmailFilled = (emailElement.value != "");
+    const isEmailFilled: boolean = (emailElement.value != "");
 
     if (!isEmailFilled) {
-        const errorMessage = "Please fill in the email field."
-        const beforeElement = document.getElementsByClassName("password")[0];
-        setError(emailElement, mainDiv, beforeElement, "email", errorMessage);
-        return
+        const errorMessage: string = "Please fill in the email field.";
+        const nextElement = document.getElementsByClassName("password")[0] as HTMLDivElement;
+        setError(emailElement, centeredDiv, nextElement, ErrorTypes.email, errorMessage);
+        return;
     }
 
-    checkLoginButton(passwordElement, emailElement, "login");
+    checkLoginButton(passwordElement, emailElement, loginElement.id);
 }
 
-function validateLogin() {
-    var configAPI = {
+function validateLogin(): void {
+    var configAPI: ConfigAPI = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,42 +90,37 @@ function validateLogin() {
         })
     };
 
-    console.log(configAPI);
     fetch('api/auth/signin', configAPI)
         .then(response => { return response.json() })
         .then(response => {
-            console.log(response);
-            if (!response.answer) {
-                const emailOnError = hasErrorBorder(emailElement);
-                const passwordOnError = hasErrorBorder(passwordElement);
+            const hasAnswer = (!response.answer);
+            if (hasAnswer) {
+                const emailOnError: boolean = hasErrorBorder(emailElement);
+                const passwordOnError: boolean = hasErrorBorder(passwordElement);
 
                 if (emailOnError && passwordOnError)
-                    return
+                    return;
 
-                const errorMessage = "I'm sorry, but the email and/or password provided is not correct or does not exist."
+                const errorMessage: string = "I'm sorry, but the email and/or password provided is not correct or does not exist."
                 addErrorBorder(emailElement);
                 addErrorBorder(passwordElement);
-                addErrorMessage(mainDiv, loginElement, "login", errorMessage);
-                return
+                addErrorMessage(centeredDiv, loginElement, ErrorTypes.login, errorMessage);
+                return;
             }
 
-            console.log("asdadaa");
-/*             const user = response.data;
+            
+/*          const user = response.data;
             checkRememberMe(user);
             window.open("/perfil","_self") */
         })
         .catch(error => console.log(error))
 }
 
-function checkLocalStorage() {
-    const name = localStorage.getItem("name");
-    const avatar = localStorage.getItem("avatar");
-    const hasName = (name !== null);
-    const hasAvatar = (avatar !== null);
+function checkLocalStorage() : void {
+    const token : string = localStorage.getItem("token");
 
-    if (hasName && hasAvatar) {
-        window.open("/perfil", "_self");
-    }
+    if (token) 
+        alert("Está logado");    
 }
 
 
