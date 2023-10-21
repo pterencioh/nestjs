@@ -10,21 +10,17 @@ import {
 } from "./buttonUtils";
 
 
-/* const checkRememberMe = (user) => {
-    const rememberMeElement = document.getElementById("rememberMe");
-    const isChecked = (rememberMeElement.checked === true);
+const checkRememberMe = (userJWT: string): void => {
+    const rememberMeElement = document.getElementById("rememberMe") as HTMLInputElement;
+    const isChecked: boolean = (rememberMeElement.checked === true);
 
     if (isChecked) {
-        localStorage.setItem("name", user.name);
-        localStorage.setItem("avatar", user.avatar);
-        localStorage.setItem("loginType", "default");
-        return
+        localStorage.setItem("token", userJWT);
+        return;
     }
 
-    sessionStorage.setItem("name", user.name);
-    sessionStorage.setItem("avatar", user.avatar);
-    sessionStorage.setItem("loginType", "default");
-} */
+    sessionStorage.setItem("token", userJWT);
+}
 
 const isValidEmail = (valueInput : string): boolean => {
     /* 
@@ -51,7 +47,7 @@ const hasOnlyLetters = (valueInput: string): boolean => {
 }
 
 export {
-    isValidEmail, hasOnlyLetters,
+    isValidEmail, hasOnlyLetters, checkRememberMe,
     addErrorBorder, removeErrorBorder, hasErrorBorder,
     addErrorMessage, removeErrorMessage, hasErrorMessage,
     setError, removeErrors, enableSubmitButton, 

@@ -34,7 +34,7 @@ export class AuthService {
 
         const user = await this.addUser(name, email, hashedPassword, 'default');
 
-        return this.generateJWTtoken(user.id, name, email);
+        return { jwt: this.generateJWTtoken(user.id, name, email) };
     }
 
     async signin({ email, password }: SigninDto) {
@@ -48,7 +48,7 @@ export class AuthService {
 
         await this.updateLastLogin(user.id);
 
-        return this.generateJWTtoken(user.id, user.name, email);
+        return { jwt: this.generateJWTtoken(user.id, user.name, email) };
     }
 
     async googleAccess(body: GoogleDto, type: GoogleTypes) {
@@ -69,7 +69,7 @@ export class AuthService {
 
         const user = await this.addUser(decodeJWT.name, decodeJWT.email, hashedPassword, 'google');
 
-        return this.generateJWTtoken(user.id, decodeJWT.name, decodeJWT.email);
+        return { jwt: this.generateJWTtoken(user.id, decodeJWT.name, decodeJWT.email) };
     }
 
     async googleSignin(decodeJWT: GoogleJWT) {
@@ -79,7 +79,7 @@ export class AuthService {
 
         await this.updateLastLogin(userExists.id);
 
-        return this.generateJWTtoken(userExists.id, decodeJWT.name, decodeJWT.email);
+        return { jwt: this.generateJWTtoken(userExists.id, decodeJWT.name, decodeJWT.email) };
     }
 
     private generateJWTtoken(id: number, name: string, email: string) {

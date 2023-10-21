@@ -4,7 +4,8 @@ export enum ErrorTypes {
   email,
   password,
   confirm,
-  login
+  login,
+  signup
 }
 
 const addErrorBorder = (currentInput: HTMLInputElement): void => {

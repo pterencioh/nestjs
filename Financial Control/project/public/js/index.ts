@@ -1,11 +1,11 @@
 import { ErrorTypes }  from "./utils/errorUtils";
 import {
-    isValidEmail, checkLoginButton,
+    isValidEmail, checkRememberMe, checkLoginButton,
     addErrorBorder, hasErrorBorder, addErrorMessage,
     setError, removeErrors
 } from "./utils/utils";
 
-interface ConfigAPI {
+export interface ConfigAPI {
     method: string,
     headers: {
         "Content-Type": string
@@ -93,7 +93,7 @@ function validateLogin(): void {
     fetch('api/auth/signin', configAPI)
         .then(response => { return response.json() })
         .then(response => {
-            const hasAnswer = (!response.answer);
+            const hasAnswer = (!response.jwt);
             if (hasAnswer) {
                 const emailOnError: boolean = hasErrorBorder(emailElement);
                 const passwordOnError: boolean = hasErrorBorder(passwordElement);
@@ -109,18 +109,18 @@ function validateLogin(): void {
             }
 
             
-/*          const user = response.data;
+            const user = response.jwt;
             checkRememberMe(user);
-            window.open("/perfil","_self") */
+            window.open("https://www.google.com.br","_self");
         })
         .catch(error => console.log(error))
 }
 
 function checkLocalStorage() : void {
-    const token : string = localStorage.getItem("token");
+    const token : string = localStorage.getItem("token") || sessionStorage.getItem("token");
 
     if (token) 
-        alert("Está logado");    
+        window.open("https://www.google.com.br","_self");  
 }
 
 

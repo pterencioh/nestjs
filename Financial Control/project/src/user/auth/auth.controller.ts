@@ -10,17 +10,18 @@ export class AuthController {
     @Post('/signup')
     signup(@Body() body: SignupDto) {
         return this.authService.signup(body);
+
     }
 
     @Post('/signin')
     signin(@Body() body: SigninDto) {
-        return this.authService.signin(body);
+        return  this.authService.signin(body);
     }
 
     @Post('/google/:typeAccess')
     googleAccess(
         @Body() body: GoogleDto,
         @Param('typeAccess', new ParseEnumPipe(GoogleTypes)) type: GoogleTypes) {
-        return this.authService.googleAccess(body, type);
+        return  this.authService.googleAccess(body, type);
     }
 }
