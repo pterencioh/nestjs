@@ -1,112 +1,87 @@
-import {
-    setError, removeErrors, checkChangePassButton
-} from "./utils/utils.js";
-
-const mainDiv = document.getElementsByClassName("centered-div")[0];
-
-const passwordElement = document.getElementById("password");
+import { ErrorTypes } from "./utils/errorUtils.js";
+import { setError, removeErrors, checkChangePassButton } from "./utils/utils.js";
+var centeredDiv = document.getElementsByClassName("centered-div")[0];
+var passwordElement = document.getElementById("password");
 passwordElement.addEventListener("change", validatePassword);
-
-const showPasswordElement = document.getElementById("showPassword");
+var showPasswordElement = document.getElementById("showPassword");
 showPasswordElement.addEventListener("click", showPassword);
-
-const confirmPassElement = document.getElementById("confirmPassword");
+var confirmPassElement = document.getElementById("confirmPassword");
 confirmPassElement.addEventListener("change", verifyPassword);
-
-const showConfirmElement = document.getElementById("showConfirmPassword");
+var showConfirmElement = document.getElementById("showConfirmPassword");
 showConfirmElement.addEventListener("click", showConfirm);
-
-const changePassElement = document.getElementById("changePass");
+var changePassElement = document.getElementById("changePass");
 changePassElement.addEventListener("click", setNewPass);
-
 function validatePassword() {
-    const isPasswordFilled = (passwordElement.value !== "");
-    const hasPasswordError = (passwordElement.style.borderColor == "red");
-
+    var isPasswordFilled = (passwordElement.value !== "");
+    var hasPasswordError = (passwordElement.style.borderColor == "red");
     if (!isPasswordFilled) {
-        const errorMessage = "Please fill in the password field.";
-        const beforeElement = document.getElementsByClassName("showPassword")[0];
-        setError(passwordElement, mainDiv, beforeElement, "password", errorMessage);
+        var errorMessage = "Please fill in the password field.";
+        var nextElement = document.getElementsByClassName("showPassword")[0];
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
-        return
+        return;
     }
-
     if (isPasswordFilled && hasPasswordError)
-        removeErrors(passwordElement, "password");
-
-    const isConfirmFilled = (confirmPassElement.value !== "");
-    const hasConfirmError = (confirmPassElement.style.borderColor == "red");
+        removeErrors(passwordElement, ErrorTypes.password);
+    var isConfirmFilled = (confirmPassElement.value !== "");
+    var hasConfirmError = (confirmPassElement.style.borderColor == "red");
     if (isConfirmFilled)
         confirmPassElement.value = "";
-
     if (hasConfirmError)
-        removeErrors(confirmPassElement, "confirm");
-
+        removeErrors(confirmPassElement, ErrorTypes.confirm);
     checkChangePassButton(passwordElement, confirmPassElement);
 }
-
 function showPassword() {
-    const inputPassword = document.getElementById("password");
-    let inputType = inputPassword.getAttribute("type");
-
+    var inputPassword = document.getElementById("password");
+    var inputType = inputPassword.getAttribute("type");
     inputType = inputType === 'password' ? 'text' : 'password';
     inputPassword.setAttribute("type", inputType);
 }
-
 function verifyPassword() {
-    const isPasswordFilled = (passwordElement.value !== "");
-    const isConfirmFilled = (confirmPassElement.value !== "");
-
+    var isPasswordFilled = (passwordElement.value !== "");
+    var isConfirmFilled = (confirmPassElement.value !== "");
     if (!isPasswordFilled) {
-        const errorMessage = "Please fill in the password field.";
-        const beforeElement = document.getElementsByClassName("showPassword")[0];
-        setError(passwordElement, mainDiv, beforeElement, "password", errorMessage);
+        var errorMessage = "Please fill in the password field.";
+        var nextElement = document.getElementsByClassName("showPassword")[0];
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
-        return
+        return;
     }
-
     if (!isConfirmFilled) {
-        const errorMessage = "Please confirm your password.";
-        const beforeElement = document.getElementsByClassName("showConfirmPassword")[0];
-        setError(confirmPassElement, mainDiv, beforeElement, "confirm", errorMessage);
+        var errorMessage = "Please confirm your password.";
+        var nextElement = document.getElementsByClassName("showConfirmPassword")[0];
+        setError(confirmPassElement, centeredDiv, nextElement, ErrorTypes.confirm, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
-        return
+        return;
     }
-
-    const isSamePassword = (passwordElement.value == confirmPassElement.value);
+    var isSamePassword = (passwordElement.value == confirmPassElement.value);
     if (!isSamePassword) {
-        const errorMessage = "Your password doesn't match!";
-        const beforeElementForPassword = document.getElementsByClassName("showPassword")[0];
-        const beforeElementForConfirm = document.getElementsByClassName("showConfirmPassword")[0];
-        setError(passwordElement, mainDiv, beforeElementForPassword, "password", errorMessage);
-        setError(confirmPassElement, mainDiv, beforeElementForConfirm, "confirm", errorMessage);
+        var errorMessage = "Your password doesn't match!";
+        var nextElementForPassword = document.getElementsByClassName("showPassword")[0];
+        var nextElementForConfirm = document.getElementsByClassName("showConfirmPassword")[0];
+        setError(passwordElement, centeredDiv, nextElementForPassword, ErrorTypes.password, errorMessage);
+        setError(confirmPassElement, centeredDiv, nextElementForConfirm, ErrorTypes.confirm, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
-        return
+        return;
     }
-
-    const hasPasswordError = (passwordElement.style.borderColor == "red");
-    const hasConfirmError = (confirmPassElement.style.borderColor == "red");
-
+    var hasPasswordError = (passwordElement.style.borderColor == "red");
+    var hasConfirmError = (confirmPassElement.style.borderColor == "red");
     if (isSamePassword && hasPasswordError && hasConfirmError) {
-        removeErrors(passwordElement, "password");
-        removeErrors(confirmPassElement, "confirm");
+        removeErrors(passwordElement, ErrorTypes.password);
+        removeErrors(confirmPassElement, ErrorTypes.confirm);
     }
-
     checkChangePassButton(passwordElement, confirmPassElement);
+    return;
 }
-
 function showConfirm() {
-    const inputConfirm = document.getElementById("confirmPassword");
-    let inputType = inputConfirm.getAttribute("type");
-
+    var inputConfirm = document.getElementById("confirmPassword");
+    var inputType = inputConfirm.getAttribute("type");
     inputType = inputType === 'password' ? 'text' : 'password';
     inputConfirm.setAttribute("type", inputType);
 }
-
 function setNewPass() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    const configAPI = {
+    var urlParams = new URLSearchParams(window.location.search);
+    var configAPI = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,14 +89,12 @@ function setNewPass() {
             password: passwordElement.value
         })
     };
-
     fetch('/password', configAPI)
-        .then(response => { return response.json() })
-        .then(responseJSON => {
-            if(responseJSON.status == 200){
-                alert("Password successfully updated.");
-                window.open("/","_self");
-            }
-        })
-
+        .then(function (response) { return response.json(); })
+        .then(function (responseJSON) {
+        if (responseJSON.status == 200) {
+            alert("Password successfully updated.");
+            window.open("/", "_self");
+        }
+    });
 }

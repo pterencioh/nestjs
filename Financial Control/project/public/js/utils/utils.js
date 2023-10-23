@@ -29,4 +29,15 @@ var hasOnlyLetters = function (valueInput) {
     var onlyLetters = regexLetters.test(valueInput);
     return onlyLetters;
 };
-export { isValidEmail, hasOnlyLetters, checkRememberMe, addErrorBorder, removeErrorBorder, hasErrorBorder, addErrorMessage, removeErrorMessage, hasErrorMessage, setError, removeErrors, enableSubmitButton, disableSubmitButton, checkLoginButton, checkChangeButton, checkSignupButton, checkChangePassButton };
+var isSecurePass = function (password) {
+    /*
+        "\S"                     - Checks if the string do NOT contains white space.
+        "(?=.*[A-Z])"            - Checks if the string contains at least one uppercase letter.
+        "(?=.*[!@#$%^&*?:|])"    - Checks if the string contains at least one special character.
+        "{10,}$"                 - Checks if the string has at least 10 characters in total.
+    
+    */
+    var regex = /^(?=.*[!@#$%^&*?:|])(?=.*[A-Z])\S{10,}$/;
+    return regex.test(password);
+};
+export { isValidEmail, hasOnlyLetters, checkRememberMe, addErrorBorder, removeErrorBorder, hasErrorBorder, addErrorMessage, removeErrorMessage, hasErrorMessage, setError, removeErrors, enableSubmitButton, disableSubmitButton, checkLoginButton, checkChangeButton, checkSignupButton, checkChangePassButton, isSecurePass };

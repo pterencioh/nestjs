@@ -42,7 +42,7 @@ export class AuthService {
         if (!user)
             throw new HttpException('Invalid credentials', 400);
 
-        const isValidPassword = bcrypt.compare(password, user.password);
+        const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword)
             throw new HttpException('Invalid credentials', 400);
 

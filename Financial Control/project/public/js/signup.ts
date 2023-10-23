@@ -2,7 +2,7 @@ import { ConfigAPI } from ".";
 import { ErrorTypes } from "./utils/errorUtils";
 import {
     isValidEmail, setError, removeErrors, checkSignupButton,
-    hasOnlyLetters, disableSubmitButton
+    hasOnlyLetters, disableSubmitButton, isSecurePass
 } from "./utils/utils";
 
 const centeredDiv = document.getElementsByClassName("centered-div")[0] as HTMLDivElement;
@@ -29,11 +29,17 @@ signupElement.addEventListener("click", signupUser);
 
 function validateName(): void {
     const isNameValid: boolean = hasOnlyLetters(nameElement.value);
+    const nextElement = document.getElementsByClassName("username")[0] as HTMLDivElement;
 
     if (!isNameValid) {
-        const errorMessage: string = "Please fill in your name using letters only!";
-        const nextElement = document.getElementsByClassName("username")[0] as HTMLDivElement;
-        setError(nameElement, centeredDiv, nextElement, ErrorTypes.name, errorMessage);
+        setError(nameElement, centeredDiv, nextElement, ErrorTypes.name, "Please fill in your name using letters only!");
+        checkSignupButton(nameElement, emailElement, passwordElement, confirmPassElement);
+        return;
+    }
+
+    const isLengthValid: boolean = (nameElement.value.length >= 10);
+    if(!isLengthValid){
+        setError(nameElement, centeredDiv, nextElement, ErrorTypes.name, "Please fill in at least your first and last name!");
         checkSignupButton(nameElement, emailElement, passwordElement, confirmPassElement);
         return;
     }
@@ -66,10 +72,17 @@ function validateEmail(): void {
 function validatePassword(): void {
     const isPasswordFilled: boolean = (passwordElement.value !== "");
     const hasPasswordError: boolean = (passwordElement.style.borderColor == "red");
+    const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
 
     if (!isPasswordFilled) {
-        const errorMessage: string = "Please fill in the password field.";
-        const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, "Please fill in the password field.");
+        checkSignupButton(nameElement, emailElement, passwordElement, confirmPassElement);
+        return;
+    }
+
+    const matchRules: boolean = isSecurePass(passwordElement.value);
+    if(!matchRules){
+        const errorMessage = "Your password must have: \n→ NO spaces\n→ At least 10 characters \n→ A special character: !@#$%^&*?:| \n→ A capital letter";
         setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
         checkSignupButton(nameElement, emailElement, passwordElement, confirmPassElement);
         return;
@@ -158,10 +171,10 @@ function signupUser(): void {
         })
     };
 
-    fetch('/signup', configAPI)
+    fetch('/api/auth/signup', configAPI)
         .then(response => { return response.json() })
         .then(responseJSON => {
-            const usernameUnavailable: boolean = (responseJSON.status == 409);
+            const usernameUnavailable: boolean = (responseJSON.statusCode == 409);
             if(usernameUnavailable){
                 const hasUsernameError: boolean = (emailElement.style.borderColor == "red");
                 if(!hasUsernameError){
@@ -173,11 +186,10 @@ function signupUser(): void {
                 }
             }
 
-            const userCreated:boolean = (responseJSON.status == 200);
+            const userCreated:boolean = (responseJSON.jwt);
             if(userCreated){
-/*                 sessionStorage.setItem("name", responseJSON.data.name);
-                sessionStorage.setItem("avatar", responseJSON.data.avatar);
-                window.open("/perfil","_self"); */
+                sessionStorage.setItem("token", responseJSON.jwt);
+                window.open("https://www.youtube.com.br","_self");
                 return;
             }
 

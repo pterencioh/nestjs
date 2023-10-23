@@ -61,8 +61,7 @@ function validateLogin() {
     fetch('api/auth/signin', configAPI)
         .then(function (response) { return response.json(); })
         .then(function (response) {
-            console.log(response);
-/*         var hasAnswer = (!response.jwt);
+        var hasAnswer = (!response.jwt);
         if (hasAnswer) {
             var emailOnError = hasErrorBorder(emailElement);
             var passwordOnError = hasErrorBorder(passwordElement);
@@ -76,7 +75,7 @@ function validateLogin() {
         }
         var user = response.jwt;
         checkRememberMe(user);
-        window.open("https://www.google.com.br", "_self"); */
+        window.open("https://www.google.com.br", "_self");
     })
         .catch(function (error) { return console.log(error); });
 }

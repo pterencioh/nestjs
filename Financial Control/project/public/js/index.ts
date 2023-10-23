@@ -109,7 +109,7 @@ function validateLogin(): void {
             }
 
             
-            const user = response.jwt;
+            const user: string = response.jwt;
             checkRememberMe(user);
             window.open("https://www.google.com.br","_self");
         })
