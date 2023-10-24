@@ -22,7 +22,7 @@ const checkLoginButton = (passwordElement: HTMLInputElement, emailElement: HTMLI
     disableSubmitButton(buttonID);
 };
 
-const checkChangeButton = (emailElement: HTMLInputElement, buttonID: string): void => {
+const checkResetButton = (emailElement: HTMLInputElement, buttonID: string): void => {
     const isEmailEmpty: boolean = (emailElement.value == "");
     const isEmailError: boolean = (emailElement.style.borderColor == "red");
 
@@ -73,7 +73,7 @@ export {
     enableSubmitButton, 
     disableSubmitButton, 
     checkLoginButton,
-    checkChangeButton, 
+    checkResetButton, 
     checkSignupButton, 
     checkChangePassButton
 }

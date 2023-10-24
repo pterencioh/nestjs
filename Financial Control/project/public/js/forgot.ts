@@ -1,14 +1,14 @@
 import { ConfigAPI } from ".";
 import { ErrorTypes } from "./utils/errorUtils";
 import {
-    isValidEmail, setError, removeErrors, checkChangeButton
+    isValidEmail, setError, removeErrors, checkResetButton
 } from "./utils/utils";
 
 const centeredDiv = document.getElementsByClassName("centered-div")[0] as HTMLDivElement;
 const emailElement = document.getElementById("email") as HTMLInputElement;
 emailElement.addEventListener("change", validateEmail);
-const changeButton = document.getElementById("change") as HTMLButtonElement;
-changeButton.addEventListener("click", validateChange);
+const resetButton = document.getElementById("reset") as HTMLButtonElement;
+resetButton.addEventListener("click", validateChange);
 
 
 function validateEmail(): void {
@@ -16,8 +16,8 @@ function validateEmail(): void {
 
     if (!isValidValue) {
         const errorMessage: string = "Please provide a valid email. i.e. 'example@example.com'";
-        setError(emailElement, centeredDiv, changeButton, ErrorTypes.email, errorMessage);
-        checkChangeButton(emailElement, changeButton.id);
+        setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, errorMessage);
+        checkResetButton(emailElement, resetButton.id);
         return;
     }
 
@@ -25,7 +25,7 @@ function validateEmail(): void {
     if (hasBorderError)
         removeErrors(emailElement, ErrorTypes.email);
 
-    checkChangeButton(emailElement, "change");
+    checkResetButton(emailElement, "change");
 }
 
 function validateChange(): void {
@@ -44,8 +44,8 @@ function validateChange(): void {
         const hasEmailError: boolean = (emailElement.style.borderColor == "red");
         if(userNotFound && !hasEmailError){
             const errorMessage: string = "Sorry, but the email provided is not correct or he is not registered.";
-            setError(emailElement, centeredDiv, changeButton, ErrorTypes.email, errorMessage);
-            checkChangeButton(emailElement, "change");
+            setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, errorMessage);
+            checkResetButton(emailElement, "change");
             return;
         }
 

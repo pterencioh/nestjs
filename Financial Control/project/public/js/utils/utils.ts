@@ -6,7 +6,7 @@ import {
 
 import {
     enableSubmitButton, disableSubmitButton, checkLoginButton,
-    checkChangeButton, checkSignupButton, checkChangePassButton
+    checkResetButton, checkSignupButton, checkChangePassButton
 } from "./buttonUtils";
 
 
@@ -63,6 +63,6 @@ export {
     addErrorBorder, removeErrorBorder, hasErrorBorder,
     addErrorMessage, removeErrorMessage, hasErrorMessage,
     setError, removeErrors, enableSubmitButton, 
-    disableSubmitButton, checkLoginButton, checkChangeButton, 
+    disableSubmitButton, checkLoginButton, checkResetButton, 
     checkSignupButton, checkChangePassButton, isSecurePass
 };

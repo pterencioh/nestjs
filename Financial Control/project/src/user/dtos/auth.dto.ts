@@ -26,3 +26,9 @@ export class GoogleDto {
     @IsNotEmpty()
     jwt: string;
 }
+
+export class ResetDto {
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+}

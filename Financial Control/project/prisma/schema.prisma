@@ -115,6 +115,7 @@ model users {
   last_login_at       DateTime              @default(now()) @db.Timestamp(6)
   user_role           user_roles            @default(user)
   created_by          created_types         @default(default)
+  reset_token         String?               @db.VarChar(300)
   cash_flow           cash_flow[]
   category            category[]
   credit_installments credit_installments[]
