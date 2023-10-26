@@ -21,7 +21,7 @@ export class SigninDto {
     password: string;
 }
 
-export class GoogleDto {
+export class JWTDto {
     @IsString()
     @IsNotEmpty()
     jwt: string;
@@ -31,4 +31,15 @@ export class ResetDto {
     @IsEmail()
     @IsNotEmpty()
     email: string;
+}
+
+export class PasswordDto {
+    @IsString()
+    @IsNotEmpty()
+    jwt: string;
+
+    @IsString()
+    @MinLength(5)
+    @IsNotEmpty()
+    password: string;
 }

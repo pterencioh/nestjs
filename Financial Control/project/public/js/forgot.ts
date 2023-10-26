@@ -8,15 +8,14 @@ const centeredDiv = document.getElementsByClassName("centered-div")[0] as HTMLDi
 const emailElement = document.getElementById("email") as HTMLInputElement;
 emailElement.addEventListener("change", validateEmail);
 const resetButton = document.getElementById("reset") as HTMLButtonElement;
-resetButton.addEventListener("click", validateChange);
+resetButton.addEventListener("click", validateReset);
 
 
 function validateEmail(): void {
     const isValidValue: boolean = isValidEmail(emailElement.value);
 
     if (!isValidValue) {
-        const errorMessage: string = "Please provide a valid email. i.e. 'example@example.com'";
-        setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, errorMessage);
+        setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, "Please provide a valid email. i.e. 'example@example.com'");
         checkResetButton(emailElement, resetButton.id);
         return;
     }
@@ -25,10 +24,10 @@ function validateEmail(): void {
     if (hasBorderError)
         removeErrors(emailElement, ErrorTypes.email);
 
-    checkResetButton(emailElement, "change");
+    checkResetButton(emailElement, resetButton.id);
 }
 
-function validateChange(): void {
+function validateReset(): void {
     const configAPI: ConfigAPI = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
@@ -37,28 +36,28 @@ function validateChange(): void {
         })
     };
 
-    fetch('/forgot', configAPI)
+    fetch('api/auth/reset', configAPI)
     .then(response => { return response.json() })
-    .then(responseJSON => {
-        const userNotFound: boolean = (responseJSON.status == 404);
+    .then(response => {
+        const userNotFound: boolean = (response.statusCode == 404);
         const hasEmailError: boolean = (emailElement.style.borderColor == "red");
         if(userNotFound && !hasEmailError){
             const errorMessage: string = "Sorry, but the email provided is not correct or he is not registered.";
             setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, errorMessage);
-            checkResetButton(emailElement, "change");
+            checkResetButton(emailElement, resetButton.id);
             return;
         }
 
-        const alreadyExistRequest: boolean = (responseJSON.status == 409);
+        const alreadyExistRequest: boolean = (response.statusCode == 400);
         if(alreadyExistRequest){
-            alert("ATTENTION, there is already a password change request in the system, please check your email!");
+            alert("ATTENTION, there is already a password reset request in the system, please check your email!");
             window.open("/","_self");
             return;
         }
         
-        const changeRequestSend: boolean = (responseJSON.status == 200);
+        const changeRequestSend: boolean = (response.statusCode == 200);
         if(changeRequestSend){
-            alert("The password change request was successfully sent to your email!");
+            alert("The password change reset was successfully sent to your email!");
             window.open("/","_self");
             return;
         }

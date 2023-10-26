@@ -17,7 +17,7 @@ var checkLoginButton = function (passwordElement, emailElement, buttonID) {
     }
     disableSubmitButton(buttonID);
 };
-var checkChangeButton = function (emailElement, buttonID) {
+var checkResetButton = function (emailElement, buttonID) {
     var isEmailEmpty = (emailElement.value == "");
     var isEmailError = (emailElement.style.borderColor == "red");
     if (!isEmailEmpty && !isEmailError) {
@@ -56,4 +56,4 @@ var checkChangePassButton = function (passwordElement, confirmElement) {
     }
     disableSubmitButton("changePass");
 };
-export { enableSubmitButton, disableSubmitButton, checkLoginButton, checkChangeButton, checkSignupButton, checkChangePassButton };
+export { enableSubmitButton, disableSubmitButton, checkLoginButton, checkResetButton, checkSignupButton, checkChangePassButton };

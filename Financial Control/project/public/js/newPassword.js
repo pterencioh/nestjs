@@ -1,5 +1,6 @@
 import { ErrorTypes } from "./utils/errorUtils.js";
-import { setError, removeErrors, checkChangePassButton } from "./utils/utils.js";
+import { setError, removeErrors, checkChangePassButton, isSecurePass } from "./utils/utils.js";
+checkRequest();
 var centeredDiv = document.getElementsByClassName("centered-div")[0];
 var passwordElement = document.getElementById("password");
 passwordElement.addEventListener("change", validatePassword);
@@ -11,12 +12,37 @@ var showConfirmElement = document.getElementById("showConfirmPassword");
 showConfirmElement.addEventListener("click", showConfirm);
 var changePassElement = document.getElementById("changePass");
 changePassElement.addEventListener("click", setNewPass);
+function checkRequest() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var isURLParamsFilled = (urlParams.size !== 0);
+    if (!isURLParamsFilled)
+        window.open("/", "_self");
+    var configAPI = {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            jwt: urlParams.get('jwt')
+        })
+    };
+    fetch('/api/auth/jwt', configAPI)
+        .then(function (response) { return response.json(); })
+        .then(function (response) {
+        if (response.answer === false)
+            window.open("/", "_self");
+    });
+}
 function validatePassword() {
     var isPasswordFilled = (passwordElement.value !== "");
     var hasPasswordError = (passwordElement.style.borderColor == "red");
+    var nextElement = document.getElementsByClassName("showPassword")[0];
     if (!isPasswordFilled) {
-        var errorMessage = "Please fill in the password field.";
-        var nextElement = document.getElementsByClassName("showPassword")[0];
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, "Please fill in the password field.");
+        checkChangePassButton(passwordElement, confirmPassElement);
+        return;
+    }
+    var matchRules = isSecurePass(passwordElement.value);
+    if (!matchRules) {
+        var errorMessage = "Your password must have: \n→ NO spaces\n→ At least 10 characters \n→ A special character: !@#$%^&*?:| \n→ A capital letter";
         setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
@@ -40,27 +66,23 @@ function showPassword() {
 function verifyPassword() {
     var isPasswordFilled = (passwordElement.value !== "");
     var isConfirmFilled = (confirmPassElement.value !== "");
+    var nextElement = document.getElementsByClassName("showPassword")[0];
     if (!isPasswordFilled) {
-        var errorMessage = "Please fill in the password field.";
-        var nextElement = document.getElementsByClassName("showPassword")[0];
-        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, "Please fill in the password field.");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
     if (!isConfirmFilled) {
-        var errorMessage = "Please confirm your password.";
-        var nextElement = document.getElementsByClassName("showConfirmPassword")[0];
-        setError(confirmPassElement, centeredDiv, nextElement, ErrorTypes.confirm, errorMessage);
+        setError(confirmPassElement, centeredDiv, nextElement, ErrorTypes.confirm, "Please confirm your password.");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
     var isSamePassword = (passwordElement.value == confirmPassElement.value);
     if (!isSamePassword) {
-        var errorMessage = "Your password doesn't match!";
         var nextElementForPassword = document.getElementsByClassName("showPassword")[0];
         var nextElementForConfirm = document.getElementsByClassName("showConfirmPassword")[0];
-        setError(passwordElement, centeredDiv, nextElementForPassword, ErrorTypes.password, errorMessage);
-        setError(confirmPassElement, centeredDiv, nextElementForConfirm, ErrorTypes.confirm, errorMessage);
+        setError(passwordElement, centeredDiv, nextElementForPassword, ErrorTypes.password, "Your password doesn't match!");
+        setError(confirmPassElement, centeredDiv, nextElementForConfirm, ErrorTypes.confirm, "Your password doesn't match!");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
@@ -85,14 +107,14 @@ function setNewPass() {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            id: urlParams.get('id'),
+            jwt: urlParams.get('jwt'),
             password: passwordElement.value
         })
     };
-    fetch('/password', configAPI)
+    fetch("api/auth/reset/password", configAPI)
         .then(function (response) { return response.json(); })
-        .then(function (responseJSON) {
-        if (responseJSON.status == 200) {
+        .then(function (response) {
+        if (response.answer) {
             alert("Password successfully updated.");
             window.open("/", "_self");
         }

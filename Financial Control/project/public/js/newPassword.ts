@@ -1,8 +1,10 @@
 import { ConfigAPI } from ".";
 import { ErrorTypes } from "./utils/errorUtils";
 import {
-    setError, removeErrors, checkChangePassButton
+    setError, removeErrors, checkChangePassButton, isSecurePass
 } from "./utils/utils";
+
+checkRequest();
 
 const centeredDiv = document.getElementsByClassName("centered-div")[0] as HTMLDivElement;
 
@@ -21,13 +23,43 @@ showConfirmElement.addEventListener("click", showConfirm);
 const changePassElement = document.getElementById("changePass") as HTMLButtonElement;
 changePassElement.addEventListener("click", setNewPass);
 
+function checkRequest() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isURLParamsFilled: boolean = (urlParams.size !== 0);
+
+    if (!isURLParamsFilled)
+        window.open("/","_self");
+
+    const configAPI: ConfigAPI = {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            jwt: urlParams.get('jwt')
+        })
+    };
+
+    fetch('/api/auth/jwt', configAPI)
+        .then(response => { return response.json() })
+        .then(response => {
+            if(response.answer === false)
+                window.open("/","_self");            
+        })
+}
+
 function validatePassword(): void {
     const isPasswordFilled: boolean = (passwordElement.value !== "");
     const hasPasswordError: boolean = (passwordElement.style.borderColor == "red");
+    const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
 
     if (!isPasswordFilled) {
-        const errorMessage: string = "Please fill in the password field.";
-        const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, "Please fill in the password field.");
+        checkChangePassButton(passwordElement, confirmPassElement);
+        return;
+    }
+
+    const matchRules: boolean = isSecurePass(passwordElement.value);
+    if(!matchRules){
+        const errorMessage = "Your password must have: \n→ NO spaces\n→ At least 10 characters \n→ A special character: !@#$%^&*?:| \n→ A capital letter";
         setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
@@ -58,30 +90,26 @@ function showPassword(): void {
 function verifyPassword(): void {
     const isPasswordFilled: boolean = (passwordElement.value !== "");
     const isConfirmFilled: boolean = (confirmPassElement.value !== "");
+    const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
 
     if (!isPasswordFilled) {
-        const errorMessage: string = "Please fill in the password field.";
-        const nextElement = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
-        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, errorMessage);
+        setError(passwordElement, centeredDiv, nextElement, ErrorTypes.password, "Please fill in the password field.");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
 
     if (!isConfirmFilled) {
-        const errorMessage: string = "Please confirm your password.";
-        const nextElement = document.getElementsByClassName("showConfirmPassword")[0] as HTMLDivElement;
-        setError(confirmPassElement, centeredDiv, nextElement, ErrorTypes.confirm, errorMessage);
+        setError(confirmPassElement, centeredDiv, nextElement, ErrorTypes.confirm, "Please confirm your password.");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
 
     const isSamePassword: boolean = (passwordElement.value == confirmPassElement.value);
     if (!isSamePassword) {
-        const errorMessage: string = "Your password doesn't match!";
         const nextElementForPassword = document.getElementsByClassName("showPassword")[0] as HTMLDivElement;
         const nextElementForConfirm = document.getElementsByClassName("showConfirmPassword")[0] as HTMLDivElement;
-        setError(passwordElement, centeredDiv, nextElementForPassword, ErrorTypes.password, errorMessage);
-        setError(confirmPassElement, centeredDiv, nextElementForConfirm, ErrorTypes.confirm, errorMessage);
+        setError(passwordElement, centeredDiv, nextElementForPassword, ErrorTypes.password, "Your password doesn't match!");
+        setError(confirmPassElement, centeredDiv, nextElementForConfirm, ErrorTypes.confirm, "Your password doesn't match!");
         checkChangePassButton(passwordElement, confirmPassElement);
         return;
     }
@@ -113,15 +141,15 @@ function setNewPass(): void {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            id: urlParams.get('id'),
+            jwt: urlParams.get('jwt'),
             password: passwordElement.value
         })
     };
 
-    fetch('/password', configAPI)
+    fetch("api/auth/reset/password", configAPI)
         .then(response => { return response.json() })
-        .then(responseJSON => {
-            if(responseJSON.status == 200){
+        .then(response => {
+            if(response.answer){
                 alert("Password successfully updated.");
                 window.open("/","_self");
             }

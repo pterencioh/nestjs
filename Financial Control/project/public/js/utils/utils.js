@@ -1,5 +1,5 @@
 import { addErrorBorder, removeErrorBorder, hasErrorBorder, addErrorMessage, removeErrorMessage, hasErrorMessage, setError, removeErrors } from "./errorUtils.js";
-import { enableSubmitButton, disableSubmitButton, checkLoginButton, checkChangeButton, checkSignupButton, checkChangePassButton } from "./buttonUtils.js";
+import { enableSubmitButton, disableSubmitButton, checkLoginButton, checkResetButton, checkSignupButton, checkChangePassButton } from "./buttonUtils.js";
 var checkRememberMe = function (userJWT) {
     var rememberMeElement = document.getElementById("rememberMe");
     var isChecked = (rememberMeElement.checked === true);
@@ -40,4 +40,4 @@ var isSecurePass = function (password) {
     var regex = /^(?=.*[!@#$%^&*?:|])(?=.*[A-Z])\S{10,}$/;
     return regex.test(password);
 };
-export { isValidEmail, hasOnlyLetters, checkRememberMe, addErrorBorder, removeErrorBorder, hasErrorBorder, addErrorMessage, removeErrorMessage, hasErrorMessage, setError, removeErrors, enableSubmitButton, disableSubmitButton, checkLoginButton, checkChangeButton, checkSignupButton, checkChangePassButton, isSecurePass };
+export { isValidEmail, hasOnlyLetters, checkRememberMe, addErrorBorder, removeErrorBorder, hasErrorBorder, addErrorMessage, removeErrorMessage, hasErrorMessage, setError, removeErrors, enableSubmitButton, disableSubmitButton, checkLoginButton, checkResetButton, checkSignupButton, checkChangePassButton, isSecurePass };

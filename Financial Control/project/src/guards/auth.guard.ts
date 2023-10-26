@@ -3,7 +3,7 @@ import { Reflector } from "@nestjs/core";
 import * as jwt from "jsonwebtoken";
 import { PrismaService } from "src/prisma/prisma.service";
 
-interface JWTPayload {
+export interface JWTPayload {
     id: number,
     name: string,
     email: string,

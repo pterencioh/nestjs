@@ -1,24 +1,23 @@
 import { ErrorTypes } from "./utils/errorUtils.js";
-import { isValidEmail, setError, removeErrors, checkChangeButton } from "./utils/utils.js";
+import { isValidEmail, setError, removeErrors, checkResetButton } from "./utils/utils.js";
 var centeredDiv = document.getElementsByClassName("centered-div")[0];
 var emailElement = document.getElementById("email");
 emailElement.addEventListener("change", validateEmail);
-var changeButton = document.getElementById("change");
-changeButton.addEventListener("click", validateChange);
+var resetButton = document.getElementById("reset");
+resetButton.addEventListener("click", validateReset);
 function validateEmail() {
     var isValidValue = isValidEmail(emailElement.value);
     if (!isValidValue) {
-        var errorMessage = "Please provide a valid email. i.e. 'example@example.com'";
-        setError(emailElement, centeredDiv, changeButton, ErrorTypes.email, errorMessage);
-        checkChangeButton(emailElement, changeButton.id);
+        setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, "Please provide a valid email. i.e. 'example@example.com'");
+        checkResetButton(emailElement, resetButton.id);
         return;
     }
     var hasBorderError = (emailElement.style.borderColor == "red");
     if (hasBorderError)
         removeErrors(emailElement, ErrorTypes.email);
-    checkChangeButton(emailElement, "change");
+    checkResetButton(emailElement, resetButton.id);
 }
-function validateChange() {
+function validateReset() {
     var configAPI = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
@@ -26,26 +25,27 @@ function validateChange() {
             email: emailElement.value
         })
     };
-    fetch('/forgot', configAPI)
+    fetch('api/auth/reset', configAPI)
         .then(function (response) { return response.json(); })
-        .then(function (responseJSON) {
-        var userNotFound = (responseJSON.status == 404);
+        .then(function (response) {
+            console.log(response)
+        var userNotFound = (response.statusCode == 404);
         var hasEmailError = (emailElement.style.borderColor == "red");
         if (userNotFound && !hasEmailError) {
             var errorMessage = "Sorry, but the email provided is not correct or he is not registered.";
-            setError(emailElement, centeredDiv, changeButton, ErrorTypes.email, errorMessage);
-            checkChangeButton(emailElement, "change");
+            setError(emailElement, centeredDiv, resetButton, ErrorTypes.email, errorMessage);
+            checkResetButton(emailElement, resetButton.id);
             return;
         }
-        var alreadyExistRequest = (responseJSON.status == 409);
+        var alreadyExistRequest = (response.statusCode == 400);
         if (alreadyExistRequest) {
-            alert("ATTENTION, there is already a password change request in the system, please check your email!");
+            alert("ATTENTION, there is already a password reset request in the system, please check your email!");
             window.open("/", "_self");
             return;
         }
-        var changeRequestSend = (responseJSON.status == 200);
+        var changeRequestSend = (response.statusCode == 200);
         if (changeRequestSend) {
-            alert("The password change request was successfully sent to your email!");
+            alert("The password change reset was successfully sent to your email!");
             window.open("/", "_self");
             return;
         }

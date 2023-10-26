@@ -1,6 +1,6 @@
-import { Controller, Post, Get, Body, Param, ParseEnumPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, ParseEnumPipe, Query, HttpException } from '@nestjs/common';
 import { AuthService, GoogleTypes } from './auth.service';
-import { GoogleDto, ResetDto, SigninDto, SignupDto } from '../dtos/auth.dto';
+import { JWTDto, PasswordDto, ResetDto, SigninDto, SignupDto } from '../dtos/auth.dto';
 import { created_types } from '@prisma/client';
 
 @Controller('api/auth')
@@ -20,7 +20,7 @@ export class AuthController {
 
     @Post('/google/:typeAccess')
     googleAccess(
-        @Body() body: GoogleDto,
+        @Body() body: JWTDto,
         @Param('typeAccess', new ParseEnumPipe(GoogleTypes)) type: GoogleTypes) {
         return  this.authService.googleAccess(body, type);
     }
@@ -30,4 +30,16 @@ export class AuthController {
         @Body() body: ResetDto){
         return this.authService.resetPassword(body);
     }
+
+    @Post('/reset/password')
+    setNewPassword(
+       @Body() body: PasswordDto){
+        return this.authService.setNewPassword(body);
+       }
+
+    @Post('/jwt')
+    verifyJWTtoken(
+        @Body() body: JWTDto){
+            return { answer : this.authService.verifyJWTtoken(body.jwt) }
+        }
 }
