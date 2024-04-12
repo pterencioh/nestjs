@@ -40,6 +40,10 @@ export class AuthController {
     @Post('/jwt')
     verifyJWTtoken(
         @Body() body: JWTDto){
-            return { answer : this.authService.verifyJWTtoken(body.jwt) }
+            const verify: boolean = this.authService.verifyJWTtoken(body.jwt);
+            if(verify)
+                var decodeJWT = this.authService.decodeJWTtoken(body.jwt);                      
+            
+            return { answer :  verify, jwt: decodeJWT || "Invalid JWT" }
         }
 }

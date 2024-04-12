@@ -49,7 +49,7 @@
         <button type="submit" id="signup" disabled>Sign up</button>
         <hr>
 
-        <div id="g_id_onload" data-client_id="750160948383-jkbhb3jq0t8vthqadr8s22s0cpf5pkq9.apps.googleusercontent.com"
+        <div id="g_id_onload" data-client_id="750160948383-o2fh53m8ahqqh3281jh24qi92oq1p6lv.apps.googleusercontent.com"
             data-context="signup" data-ux_mode="popup" data-callback="setGoogleLogin" data-auto_prompt="false">
         </div>
 
@@ -85,10 +85,11 @@
             })
         };
     
-        fetch('/signupGoogle', configAPI)
+        fetch('/api/auth/google/signup', configAPI)
             .then(response => { return response.json() })
             .then(responseJSON => {
                 if (!responseJSON.answer) {
+                    console.log(responseJSON);
                     const hasGoogleError = hasErrorMessage("google");
     
                     if (hasGoogleError)
@@ -99,15 +100,15 @@
                     addErrorMessage(mainDiv, signupElement, "google", errorMessage);
                     return
                 }
-    
+                /*
                 const name = responseJSON.data.jwt.name;
                 const avatar = responseJSON.data.jwt.picture;
     
                 sessionStorage.setItem("name", name);
                 sessionStorage.setItem("avatar", avatar);
-                sessionStorage.setItem("loginType", "google");
+                sessionStorage.setItem("loginType", "google");*/
     
-                window.open("/perfil", "_self")
+                window.open("https://www.google.com.br", "_self")
             })
             .catch(error => console.log(error))
     }

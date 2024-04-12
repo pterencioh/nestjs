@@ -188,8 +188,8 @@ function signupUser(): void {
 
             const userCreated:boolean = (responseJSON.jwt);
             if(userCreated){
-                sessionStorage.setItem("token", responseJSON.jwt);
-                window.open("https://www.youtube.com.br","_self");
+                sessionStorage.setItem("jwt", responseJSON.jwt);
+                window.open("/perfil.html","_self");
                 return;
             }
 

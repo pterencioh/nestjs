@@ -15,11 +15,11 @@ const checkRememberMe = (userJWT: string): void => {
     const isChecked: boolean = (rememberMeElement.checked === true);
 
     if (isChecked) {
-        localStorage.setItem("token", userJWT);
+        localStorage.setItem("jwt", userJWT);
         return;
     }
 
-    sessionStorage.setItem("token", userJWT);
+    sessionStorage.setItem("jwt", userJWT);
 }
 
 const isValidEmail = (valueInput : string): boolean => {

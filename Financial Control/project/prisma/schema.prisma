@@ -81,9 +81,10 @@ model receipt {
 /// 2. amount_is_positive →               Check IF 'amount' >= 0;
 /// 3. total_price_is_positive →          Check IF 'total_price' >= 0;
 /// 4. validate_income_amount →           Check IF 'amount' == 1 WHEN 'transaction_type' == 'income';
-/// 5. validate_total_installments →      Check IF 'total_installments' == 0 WHEN 'transaction_type' == 'debit,income' OR
+/// 5. validate_credit_amount →           Check IF 'amount' == 1 WHEN 'transaction_type' == 'credit';
+/// 6. validate_total_installments →      Check IF 'total_installments' == 0 WHEN 'transaction_type' == 'debit,income' OR
 ///                                             IF 'total_installments' > 0 WHEN 'transaction_type' == 'credit';
-/// 6. validate_receipt_id →              Check IF 'has_receipt' == 'TRUE' AND 'receipt_id' !== NULL OR
+/// 7. validate_receipt_id →              Check IF 'has_receipt' == 'TRUE' AND 'receipt_id' !== NULL OR
 ///                                             IF 'has_receipt' == 'FALSE' AND 'receipt_id' == NULL;
 model transactions {
   id                  Int                   @id @default(autoincrement())
@@ -110,12 +111,13 @@ model users {
   id                  Int                   @id @default(autoincrement())
   name                String                @db.VarChar(100)
   email               String                @unique(map: "User_email_key") @db.VarChar(40)
-  password            String                @db.VarChar(60)
+  password            String                @db.VarChar(100)
   created_at          DateTime              @default(now()) @db.Timestamp(6)
   last_login_at       DateTime              @default(now()) @db.Timestamp(6)
   user_role           user_roles            @default(user)
   created_by          created_types         @default(default)
   reset_token         String?               @db.VarChar(300)
+  profile_image       String?               @db.VarChar(300)
   cash_flow           cash_flow[]
   category            category[]
   credit_installments credit_installments[]

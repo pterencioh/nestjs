@@ -10,6 +10,7 @@ import { UserInterceptor } from './user/interceptors/user.interceptor';
 import { AuthGuard } from './guards/auth.guard';
 
 
+
 @Module({
   imports: [UserModule, PrismaModule, FinancialModule],
   controllers: [AppController],

@@ -1,40 +1,40 @@
-var enableSubmitButton = function (buttonID) {
-    var loginButton = document.getElementById(buttonID);
+const enableSubmitButton = (buttonID) => {
+    let loginButton = document.getElementById(buttonID);
     loginButton.removeAttribute('disabled');
 };
-var disableSubmitButton = function (buttonID) {
-    var loginButton = document.getElementById(buttonID);
+const disableSubmitButton = (buttonID) => {
+    let loginButton = document.getElementById(buttonID);
     loginButton.setAttribute('disabled', "");
 };
-var checkLoginButton = function (passwordElement, emailElement, buttonID) {
-    var isPasswordEmpty = (passwordElement.value == '');
-    var isEmailEmpty = (emailElement.value == '');
-    var hasPasswordError = (passwordElement.style.borderColor == 'red');
-    var hasEmailError = (emailElement.style.borderColor == 'red');
+const checkLoginButton = (passwordElement, emailElement, buttonID) => {
+    const isPasswordEmpty = (passwordElement.value == '');
+    const isEmailEmpty = (emailElement.value == '');
+    const hasPasswordError = (passwordElement.style.borderColor == 'red');
+    const hasEmailError = (emailElement.style.borderColor == 'red');
     if (!hasPasswordError && !hasEmailError && !isPasswordEmpty && !isEmailEmpty) {
         enableSubmitButton(buttonID);
         return;
     }
     disableSubmitButton(buttonID);
 };
-var checkResetButton = function (emailElement, buttonID) {
-    var isEmailEmpty = (emailElement.value == "");
-    var isEmailError = (emailElement.style.borderColor == "red");
+const checkResetButton = (emailElement, buttonID) => {
+    const isEmailEmpty = (emailElement.value == "");
+    const isEmailError = (emailElement.style.borderColor == "red");
     if (!isEmailEmpty && !isEmailError) {
         enableSubmitButton(buttonID);
         return;
     }
     disableSubmitButton(buttonID);
 };
-var checkSignupButton = function (nameElement, emailElement, passwordElement, confirmElement) {
-    var isNameFilled = (nameElement.value !== "");
-    var hasNameError = (nameElement.style.borderColor == "red");
-    var isEmailFilled = (emailElement.value !== "");
-    var hasEmailError = (emailElement.style.borderColor == "red");
-    var isPasswordFilled = (passwordElement.value !== "");
-    var hasPasswordError = (passwordElement.style.borderColor == "red");
-    var isConfirmFilled = (confirmElement.value !== "");
-    var hasConfirmError = (confirmElement.style.borderColor == "red");
+const checkSignupButton = (nameElement, emailElement, passwordElement, confirmElement) => {
+    const isNameFilled = (nameElement.value !== "");
+    const hasNameError = (nameElement.style.borderColor == "red");
+    const isEmailFilled = (emailElement.value !== "");
+    const hasEmailError = (emailElement.style.borderColor == "red");
+    const isPasswordFilled = (passwordElement.value !== "");
+    const hasPasswordError = (passwordElement.style.borderColor == "red");
+    const isConfirmFilled = (confirmElement.value !== "");
+    const hasConfirmError = (confirmElement.style.borderColor == "red");
     if (isNameFilled && !hasNameError &&
         isEmailFilled && !hasEmailError &&
         isPasswordFilled && !hasPasswordError &&
@@ -44,11 +44,11 @@ var checkSignupButton = function (nameElement, emailElement, passwordElement, co
     }
     disableSubmitButton("signup");
 };
-var checkChangePassButton = function (passwordElement, confirmElement) {
-    var isPasswordFilled = (passwordElement.value !== "");
-    var hasPasswordError = (passwordElement.style.borderColor == "red");
-    var isConfirmFilled = (confirmElement.value !== "");
-    var hasConfirmError = (confirmElement.style.borderColor == "red");
+const checkChangePassButton = (passwordElement, confirmElement) => {
+    const isPasswordFilled = (passwordElement.value !== "");
+    const hasPasswordError = (passwordElement.style.borderColor == "red");
+    const isConfirmFilled = (confirmElement.value !== "");
+    const hasConfirmError = (confirmElement.style.borderColor == "red");
     if (isPasswordFilled && !hasPasswordError &&
         isConfirmFilled && !hasConfirmError) {
         enableSubmitButton("changePass");

@@ -16,6 +16,7 @@ export interface SignupParams {
 export interface GoogleJWT {
     name: string;
     email: string;
+    picture: string;
 }
 
 export enum GoogleTypes {
@@ -25,7 +26,11 @@ export enum GoogleTypes {
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prismaService: PrismaService) { }
+    private readonly default_images: { [key: string]: string }[];
+    constructor(private readonly prismaService: PrismaService) { 
+        this.default_images = JSON.parse(process.env.DEFAULT_PROFILE_IMAGES)
+    }
+
     async signup({ name, email, password }: SignupDto) {
 
         const userExists = await this.getUser(email);
@@ -33,10 +38,21 @@ export class AuthService {
             throw new ConflictException();
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        const profileImage = await this.generateDefaultProfileImage();
 
-        const user = await this.addUser(name, email, hashedPassword, 'default');
+        const user = await this.addUser(name, email, hashedPassword, profileImage, 'default');
 
-        return { jwt: this.generateJWTtoken(user.id, name, email) };
+        return { jwt: this.generateJWTtoken(user.id, name, email, profileImage) };
+    }
+
+    async generateDefaultProfileImage(){
+        const randomNumber: number = Math.floor(Math.random() * 10);
+        const randomProfileImage: string = "user_profile" + randomNumber;
+        const getImageLink = this.default_images.filter((image) => image.hasOwnProperty(randomProfileImage))[0];
+
+        const profileImage: string = `https://drive.google.com/thumbnail?id=${getImageLink[randomProfileImage]}`;
+
+        return profileImage;    
     }
 
     async signin({ email, password }: SigninDto) {
@@ -54,11 +70,12 @@ export class AuthService {
 
         await this.updateLastLogin(user.id);
 
-        return { jwt: this.generateJWTtoken(user.id, user.name, email) };
+        return { jwt: this.generateJWTtoken(user.id, user.name, email, user.profile_image) };
     }
 
     async googleAccess(body:JWTDto, type: GoogleTypes) {
         const decodeJWT = jwt.decode(body.jwt) as GoogleJWT;
+        console.log(jwt.decode(body.jwt))
         if (!decodeJWT)
             throw new HttpException('Invalid credentials', 400);
 
@@ -70,12 +87,13 @@ export class AuthService {
         if (userExists)
             throw new ConflictException();
 
+
         const password = `(u_u)${decodeJWT.name}(*-*)${decodeJWT.email}(o-o)`;
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await this.addUser(decodeJWT.name, decodeJWT.email, hashedPassword, 'google');
+        const user = await this.addUser(decodeJWT.name, decodeJWT.email, hashedPassword, decodeJWT.picture, 'google');
 
-        return { jwt: this.generateJWTtoken(user.id, decodeJWT.name, decodeJWT.email) };
+        return { answer: true, jwt: this.generateJWTtoken(user.id, decodeJWT.name, decodeJWT.email, decodeJWT.picture) };
     }
 
     async googleSignin(decodeJWT: GoogleJWT) {
@@ -89,7 +107,7 @@ export class AuthService {
 
         await this.updateLastLogin(userExists.id);
 
-        return { jwt: this.generateJWTtoken(userExists.id, decodeJWT.name, decodeJWT.email) };
+        return { answer: true, jwt: this.generateJWTtoken(userExists.id, decodeJWT.name, decodeJWT.email, userExists.profile_image) };
     }
 
     async setNewPassword({ jwt: userJWT, password } : PasswordDto){
@@ -121,11 +139,12 @@ export class AuthService {
         return { answer: "Password successfully updated!" };
     }
 
-    private generateJWTtoken(id: number, name: string, email: string, expiresIn: number = 360000000) {
+    generateJWTtoken(id: number, name: string, email: string, profile_image: string, expiresIn: number = 360000000) {
         return jwt.sign({
             id,
             name,
-            email
+            email,
+            profile_image
         }, process.env.JSON_TOKEN_KEY, {
             expiresIn
         })
@@ -137,6 +156,14 @@ export class AuthService {
             return true;
         } catch (error) {
             return false;
+        }
+    }
+
+    decodeJWTtoken(token: string) {        
+        try {            
+            return jwt.decode(token) as JWTPayload;
+        } catch (error) {
+            return;
         }
     }
 
@@ -160,12 +187,13 @@ export class AuthService {
         })
     }
 
-    async addUser(name: string, email: string, password: string, createdBy: created_types) {
+    async addUser(name: string, email: string, password: string, profile_image: string, createdBy: created_types) {
         return this.prismaService.users.create({
             data: {
                 name,
                 email,
                 password,
+                profile_image,
                 created_by: createdBy
             }
         })
@@ -193,7 +221,7 @@ export class AuthService {
         if (isTokenFilled && !isTokenExpired)
             throw new HttpException('Please check your email inbox, a request was already send to you!', 400);
 
-        const userToken: string = this.generateJWTtoken(user.id, user.name, user.email, 1800);
+        const userToken: string = this.generateJWTtoken(user.id, user.name, user.email, user.profile_image, 1800);
         const addToken =  await this.prismaService.users.update({
             where: {
                 id: user.id,
@@ -209,7 +237,7 @@ export class AuthService {
 
         this.sendPasswordReset(user.name, user.email, userToken);
 
-        return { statusCode: 400, message: 'The password reset request was successfully sent to your email!'}
+        return { statusCode: 200, message: 'The password reset request was successfully sent to your email!'}
     }
 
     private sendPasswordReset = (username: string, recipient: string, resetKey: string) => {

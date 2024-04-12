@@ -1,0 +1,96 @@
+CREATE TYPE user_roles AS ENUM ('user','admin');
+CREATE TYPE created_types AS ENUM ('default','google');
+CREATE TYPE transaction_types AS ENUM ('credit','debit','income');
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(40) NOT NULL,
+  password VARCHAR(40) NOT NULL,
+  user_role user_roles NOT NULL DEFAULT 'user',
+  created_by created_types NOT NULL DEFAULT 'default',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_login_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  reset_token VARCHAR(300),
+  CONSTRAINT email_unique UNIQUE (email)
+);
+
+CREATE TABLE cash_flow (
+  id SERIAL PRIMARY KEY,
+  balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  total_expenses DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  total_credit_expenses DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER NOT NULL REFERENCES users(ID) ON DELETE CASCADE,
+  CONSTRAINT total_expenses_is_positive CHECK (total_expenses >= 0),
+  CONSTRAINT total_credit_is_positive CHECK (total_credit_expenses >= 0)
+);
+
+CREATE TABLE category (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE receipt (
+  id SERIAL PRIMARY KEY,
+  url_attachment VARCHAR(200) NOT NULL,
+  receipt_date TIMESTAMP NOT NULL,
+  amount_transactions INTEGER NOT NULL DEFAULT 0,
+  total_price_transactions DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES category(id) ON DELETE SET NULL,
+  CONSTRAINT amount_transactions_is_positive CHECK (amount_transactions >= 0),
+  CONSTRAINT total_price_transactions_is_positive CHECK (total_price_transactions >= 0)
+);
+
+
+CREATE TABLE transactions(
+  id SERIAL PRIMARY KEY,
+  description VARCHAR(20) NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  amount INTEGER NOT NULL,
+  total_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  transaction_type transaction_types NOT NULL,
+  total_installments INTEGER NOT NULL DEFAULT 0,
+  installments_paid BOOLEAN NOT NULL DEFAULT FALSE,
+  has_receipt BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  receipt_id INTEGER DEFAULT NULL REFERENCES receipt(id) ON DELETE SET NULL,
+  category_id INTEGER REFERENCES category(id) ON DELETE SET NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT unit_price_is_positive CHECK (unit_price >= 0),
+  CONSTRAINT amount_is_positive CHECK (amount >= 0),
+  CONSTRAINT validate_income_amount Check(transaction_type != 'income' OR (transaction_type = 'income'  AND amount = 1)),
+  CONSTRAINT validate_credit_amount Check(transaction_type != 'credit' OR (transaction_type = 'credit'  AND amount = 1)),
+  CONSTRAINT total_price_is_positive CHECK (total_price >= 0),
+  CONSTRAINT validate_total_installments CHECK ( (transaction_type = 'debit' OR transaction_type = 'income' ) AND total_installments = 0 OR ( transaction_type = 'credit' AND total_installments > 0 ) ),
+  CONSTRAINT validate_receipt_id CHECK ((has_receipt = true AND receipt_id IS NOT NULL) OR (has_receipt = false AND receipt_id IS NULL))
+);
+
+
+CREATE TABLE credit_installments(
+	id SERIAL PRIMARY KEY,
+  installment_number INTEGER NOT NULL,
+  month VARCHAR(40) NOT NULL,
+  value DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  paid BOOLEAN NOT NULL DEFAULT FALSE,
+  paid_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  transaction_id INTEGER NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT installment_number_higher_zero CHECK (installment_number > 0),
+  CONSTRAINT value_is_positive CHECK (value >= 0),
+  CONSTRAINT validate_paid_date CHECK ((paid = FALSE AND paid_at IS NULL) OR (paid = TRUE AND paid_at IS NOT NULL))
+);
+
+

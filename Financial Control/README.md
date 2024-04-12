@@ -8,7 +8,8 @@
     - [Credit Installments](#credit-installments)
 
 # Database Structure
-![control_financial_db](https://github.com/pterencioh/nestjs/assets/107655462/d2ac00f8-05a7-433e-888d-2be00292ef7f)
+![control_financial](https://github.com/pterencioh/nestjs/assets/107655462/268ca1d0-cec3-400e-8e99-c251b1980f47)
+
 
 # Tables Additional Information
 
@@ -115,12 +116,6 @@
       <th>Events</th>
   </tr>
   <tr>
-      <td>set_updated_at()</td>
-      <td>Update the 'updated_at' column when an <b>UPDATE</b> occurs.</td>
-      <td align="center"><b>BEFORE</b></td>
-      <td align="center"><b>UPDATE</b></td>
-  </tr>
-  <tr>
       <td>get_amount_transactions()</td>
       <td>When a record is created or deleted with a related receipt, the function will count how many transactions exist in that receipt and will <b>UPDATE</b> the 'amount_transactions' column of the related receipt.</td>
       <td align="center"><b>AFTER</b></td>
@@ -208,6 +203,10 @@ Balance = Total Income - (Total Debits + Total Credits Paid).</td>
   <tr>
       <td>validate_income_amount</td>
       <td>Check IF 'amount' == 1 WHEN 'transaction_type' == 'income'</td>
+  </tr>
+  <tr>
+      <td>validate_credit_amount</td>
+      <td>Check IF 'amount' == 1 WHEN 'transaction_type' == 'credit'</td>
   </tr>
   <tr>
       <td>validate_total_installments</td>

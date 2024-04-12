@@ -41,7 +41,7 @@
         <button type="submit" id="login" disabled>Log in</button>
         <hr>
 
-        <div id="g_id_onload" data-client_id="750160948383-jkbhb3jq0t8vthqadr8s22s0cpf5pkq9.apps.googleusercontent.com"
+        <div id="g_id_onload" data-client_id="750160948383-o2fh53m8ahqqh3281jh24qi92oq1p6lv.apps.googleusercontent.com"
             data-context="signin" data-ux_mode="popup" data-callback="sendGoogleLogin" data-auto_prompt="false">
         </div>
 
@@ -78,10 +78,7 @@ window.sendGoogleLogin = (response) => {
         })
     };
 
-    console.log(JSON.stringify({
-            jwt: response.credential
-        }))
-    fetch('/google', configAPI)
+    fetch('/api/auth/google/signin', configAPI)
         .then(response => { return response.json() })
         .then(responseJSON => {
             if (!responseJSON.answer) {
@@ -95,15 +92,9 @@ window.sendGoogleLogin = (response) => {
                 addErrorMessage(mainDiv, loginElement, "google", errorMessage);
                 return
             }
-
-            const name = responseJSON.data.jwt.name;
-            const avatar = responseJSON.data.jwt.picture;
-
-            sessionStorage.setItem("name", name);
-            sessionStorage.setItem("avatar", avatar);
-            sessionStorage.setItem("loginType", "google");
-
-            /* window.open("/perfil", "_self") */
+            
+            sessionStorage.setItem("jwt", responseJSON.jwt);
+            window.open("/perfil.html", "_self") 
         })
         .catch(error => console.log(error))
 }

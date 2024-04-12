@@ -8,40 +8,40 @@ export var ErrorTypes;
     ErrorTypes[ErrorTypes["login"] = 5] = "login";
     ErrorTypes[ErrorTypes["signup"] = 6] = "signup";
 })(ErrorTypes || (ErrorTypes = {}));
-var addErrorBorder = function (currentInput) {
+const addErrorBorder = (currentInput) => {
     currentInput.style.borderColor = 'red';
 };
-var removeErrorBorder = function (currentInput) {
+const removeErrorBorder = (currentInput) => {
     currentInput.style.borderColor = '';
 };
-var hasErrorBorder = function (currentInput) {
+const hasErrorBorder = (currentInput) => {
     return currentInput.style.borderColor == 'red';
 };
-var addErrorMessage = function (centeredDiv, nextElement, errorType, errorMessage) {
-    var newElement = document.createElement('p');
+const addErrorMessage = (centeredDiv, nextElement, errorType, errorMessage) => {
+    let newElement = document.createElement('p');
     newElement.classList.add('errorMessage');
-    newElement.setAttribute('id', "error_".concat(errorType));
+    newElement.setAttribute('id', `error_${errorType}`);
     newElement.innerText = errorMessage;
     centeredDiv.insertBefore(newElement, nextElement);
 };
-var removeErrorMessage = function (errorType) {
-    var element = document.getElementById("error_".concat(errorType));
+const removeErrorMessage = (errorType) => {
+    const element = document.getElementById(`error_${errorType}`);
     element.remove();
 };
-var hasErrorMessage = function (errorType) {
-    var element = document.getElementById("error_".concat(errorType));
+const hasErrorMessage = (errorType) => {
+    const element = document.getElementById(`error_${errorType}`);
     return element != undefined;
 };
-var setError = function (currentInput, centeredDiv, nextElement, errorType, errorMessage) {
-    var isElementOnError = hasErrorBorder(currentInput);
+const setError = (currentInput, centeredDiv, nextElement, errorType, errorMessage) => {
+    const isElementOnError = hasErrorBorder(currentInput);
     if (!isElementOnError) {
         addErrorBorder(currentInput);
         addErrorMessage(centeredDiv, nextElement, errorType, errorMessage);
         return;
     }
-    var existErrorMessage = hasErrorMessage(errorType);
-    var getErrorMessage = document.getElementById("error_".concat(errorType)).innerText || '';
-    var sameError = (existErrorMessage && getErrorMessage == errorMessage);
+    const existErrorMessage = hasErrorMessage(errorType);
+    const getErrorMessage = document.getElementById(`error_${errorType}`).innerText || '';
+    const sameError = (existErrorMessage && getErrorMessage == errorMessage);
     if (sameError)
         return;
     if (!sameError) {
@@ -49,7 +49,7 @@ var setError = function (currentInput, centeredDiv, nextElement, errorType, erro
         addErrorMessage(centeredDiv, nextElement, errorType, errorMessage);
     }
 };
-var removeErrors = function (currentInput, errorType) {
+const removeErrors = (currentInput, errorType) => {
     removeErrorBorder(currentInput);
     removeErrorMessage(errorType);
 };

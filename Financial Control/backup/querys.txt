@@ -1,0 +1,30 @@
+INSERT INTO users 
+(name, email,password)
+VALUES
+('admin','admin@admin.com','admin');
+
+INSERT INTO category 
+(name, user_id)
+VALUES
+('Master',1);
+
+INSERT INTO receipt 
+(url_attachment,receipt_date,user_id,category_id)
+VALUES
+('https://url.com',now(),1,1);
+
+INSERT INTO transactions 
+(description,unit_price,amount,transaction_type,has_receipt,receipt_id,category_id,user_id)
+VALUES
+('amount transactions',30,2,'debit',TRUE,1,1,1);
+
+INSERT INTO transactions 
+(description,unit_price,amount,transaction_type,total_installments,category_id,user_id)
+VALUES
+('amount transactions',30,2,'credit',10,1,1);
+
+
+INSERT INTO transactions 
+(description,unit_price,amount,transaction_type,category_id,user_id)
+VALUES
+('amount transactions',20000,1,'income',1,1);

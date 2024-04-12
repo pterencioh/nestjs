@@ -8,7 +8,8 @@ export interface JWTPayload {
     name: string,
     email: string,
     iat: number,
-    exp: number
+    exp: number,
+    picture: string
 }
 
 @Injectable()

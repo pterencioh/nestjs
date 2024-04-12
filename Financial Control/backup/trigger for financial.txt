@@ -1,0 +1,99 @@
+INSERT INTO transactions
+(description,unit_price,amount,total_price,transaction_type,category_id,user_id)
+VALUES
+('Salario',20000,1,20000,'income',1,1);
+
+INSERT INTO users
+(name,email,password)
+VALUES
+('Admin', 'Admin@admin', '123');
+
+INSERT INTO category
+(name, user_id)
+VALUES
+('MASTER', 1);
+
+INSERT INTO receipt
+(url_attachment,receipt_date,amount_transactions,total_price_transactions,user_id,category_id)
+VALUES
+('url',NOW(),0,0,1,1)
+
+INSERT INTO cash_flow
+(balance,total_expenses,total_credit_expenses,user_id)
+VALUES
+(0,0,0,1);
+
+CREATE TRIGGER update_at_trigger
+BEFORE UPDATE on receipt
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER update_at_trigger
+BEFORE UPDATE on category
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER update_at_trigger
+BEFORE UPDATE on cash_flow
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER update_at_trigger
+BEFORE UPDATE on credit_installments
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER create_cash_flow_trigger
+AFTER INSERT on users
+FOR EACH ROW
+EXECUTE FUNCTION create_cash_flow();
+
+CREATE TRIGGER check_status_installments_trigger
+AFTER UPDATE on credit_installments
+FOR EACH ROW
+EXECUTE FUNCTION check_status_installments();
+
+CREATE TRIGGER calculate_total_price_trigger
+BEFORE INSERT OR UPDATE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION calculate_total_price();
+
+CREATE TRIGGER disable_update_credit_trigger
+BEFORE UPDATE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION disable_update_credit();
+
+CREATE TRIGGER update_at_trigger
+BEFORE UPDATE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER create_credit_installments_trigger
+AFTER INSERT on transactions
+FOR EACH ROW
+EXECUTE FUNCTION create_credit_installments();
+
+CREATE TRIGGER amount_transactions_trigger
+AFTER INSERT OR DELETE ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION get_amount_transactions();
+
+CREATE TRIGGER total_price_receipt_trigger
+AFTER INSERT OR UPDATE OR DELETE ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION get_total_price_receipt();
+
+CREATE TRIGGER get_balance_trigger
+AFTER INSERT OR UPDATE OR DELETE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION get_balance();
+
+CREATE TRIGGER get_total_expenses_trigger
+AFTER INSERT OR UPDATE OR DELETE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION get_total_expenses();
+
+CREATE TRIGGER get_total_credit_expenses_trigger
+AFTER INSERT OR DELETE on transactions
+FOR EACH ROW
+EXECUTE FUNCTION get_total_credit_expenses();

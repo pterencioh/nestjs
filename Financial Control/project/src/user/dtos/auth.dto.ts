@@ -43,3 +43,9 @@ export class PasswordDto {
     @IsNotEmpty()
     password: string;
 }
+
+export class profileDto {
+    @IsString()
+    @IsNotEmpty()
+    fileLink: string;
+}

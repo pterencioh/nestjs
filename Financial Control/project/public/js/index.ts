@@ -111,16 +111,16 @@ function validateLogin(): void {
             
             const user: string = response.jwt;
             checkRememberMe(user);
-            window.open("https://www.google.com.br","_self");
+            window.open("/perfil.html","_self");
         })
         .catch(error => console.log(error))
 }
 
 function checkLocalStorage() : void {
-    const token : string = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token : string = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
 
     if (token) 
-        window.open("https://www.google.com.br","_self");  
+        window.open("/perfil.html","_self");  
 }
 
 
