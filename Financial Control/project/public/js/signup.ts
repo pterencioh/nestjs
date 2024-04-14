@@ -189,7 +189,7 @@ function signupUser(): void {
             const userCreated:boolean = (responseJSON.jwt);
             if(userCreated){
                 sessionStorage.setItem("jwt", responseJSON.jwt);
-                window.open("/perfil.html","_self");
+                window.open("/profile.html","_self");
                 return;
             }
 

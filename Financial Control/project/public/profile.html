@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="icon" type="image/x-icon" href="./img/logo-icon.png" />
-    <script type="module" src="./js/perfil.js" defer></script>
-    <title>Perfil</title>
+    <script type="module" src="./js/profile.js" defer></script>
+    <title>Profile</title>
 </head>
 
 <body>
@@ -15,7 +15,8 @@
         
         <div class="images">
                 <img src="" id="perfil-img" style="cursor: pointer;">
-                <img src="./img/icons8-edit-30.png" alt="Perfil" id="edit-icon" class="edit-icon" style="cursor: pointer;">
+                <img src="./img/icons8-edit-30.png" alt="Profile" id="edit-icon" class="edit-icon" style="cursor: pointer;">
+                <div class="spinner" style="display: none;" id="spinner"></div>
         </div>
         
         <div class="greetings">
@@ -24,10 +25,11 @@
         <div class="message">
         </div>
 
+        
         <input type="file" id="file-input" accept="image/gif, image/jpeg, image/png" style="display: none;" >
 
         <div class="action">
-            <button type="button">Back</button>
+            <button type="button" id="back">Back</button>
             <button type="submit" id="save" disabled>Save</button>
         </div>
 

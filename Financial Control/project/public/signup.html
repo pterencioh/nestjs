@@ -89,7 +89,6 @@
             .then(response => { return response.json() })
             .then(responseJSON => {
                 if (!responseJSON.answer) {
-                    console.log(responseJSON);
                     const hasGoogleError = hasErrorMessage("google");
     
                     if (hasGoogleError)
@@ -100,15 +99,9 @@
                     addErrorMessage(mainDiv, signupElement, "google", errorMessage);
                     return
                 }
-                /*
-                const name = responseJSON.data.jwt.name;
-                const avatar = responseJSON.data.jwt.picture;
-    
-                sessionStorage.setItem("name", name);
-                sessionStorage.setItem("avatar", avatar);
-                sessionStorage.setItem("loginType", "google");*/
-    
-                window.open("https://www.google.com.br", "_self")
+
+                sessionStorage.setItem("jwt", responseJSON.jwt);
+                window.open("/profile.html", "_self") 
             })
             .catch(error => console.log(error))
     }

@@ -94,7 +94,7 @@ window.sendGoogleLogin = (response) => {
             }
             
             sessionStorage.setItem("jwt", responseJSON.jwt);
-            window.open("/perfil.html", "_self") 
+            window.open("/profile.html", "_self") 
         })
         .catch(error => console.log(error))
 }

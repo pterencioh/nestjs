@@ -1,6 +1,9 @@
+var elementBackButton = document.getElementById('back');
 var elementSaveButton = document.getElementById('save');
 var elementAttach = document.getElementById('file-input');
 var elementProfileImage = document.getElementById('perfil-img');
+var elementEditIcon = document.getElementById('edit-icon');
+var elementSpinner = document.getElementById('spinner');
 var token = sessionStorage.getItem("jwt") || localStorage.getItem("jwt");
 setUpPageConfig();
 function setUpPageConfig() {
@@ -77,8 +80,25 @@ function setAttachOnChange() {
 function enableSaveButton() {
     elementSaveButton.removeAttribute("disabled");
 }
+function disableButton(element) {
+    element.setAttribute("disabled", "");
+}
+function hideProfileImages() {
+    elementProfileImage.style.display = "none";
+    elementEditIcon.style.display = "none";
+}
+function setLoadingIcon() {
+    elementSpinner.style.display = "flex";
+}
+function configLoadingIcon() {
+    disableButton(elementSaveButton);
+    disableButton(elementBackButton);
+    hideProfileImages();
+    setLoadingIcon();
+}
 function saveProfileOnClick() {
     elementSaveButton.addEventListener('click', function () {
+        configLoadingIcon();
         var formData = new FormData();
         var attchment = elementAttach.files[0];
         formData.append('image', attchment);
@@ -100,7 +120,7 @@ function saveProfileOnClick() {
             if (typeToken === "local")
                 localStorage.setItem("jwt", responseJSON.jwt);
             setTimeout(function () {
-                window.open("/perfil.html", "_self");
+                window.open("/profile.html", "_self");
             }, 8000);
         })
             .catch(function (err) {

@@ -1,6 +1,9 @@
+const elementBackButton = document.getElementById('back') as HTMLButtonElement;
 const elementSaveButton = document.getElementById('save') as HTMLButtonElement;
 const elementAttach = document.getElementById('file-input') as HTMLInputElement;
 const elementProfileImage = document.getElementById('perfil-img') as HTMLImageElement;
+const elementEditIcon = document.getElementById('edit-icon') as HTMLImageElement;
+const elementSpinner = document.getElementById('spinner') as HTMLImageElement;
 var token = sessionStorage.getItem("jwt") || localStorage.getItem("jwt");
 
 setUpPageConfig();
@@ -94,9 +97,31 @@ function enableSaveButton(): void {
     elementSaveButton.removeAttribute("disabled");
 }
 
+function disableButton(element): void {
+    element.setAttribute("disabled","");
+}
+
+function hideProfileImages(){
+    elementProfileImage.style.display = "none";
+    elementEditIcon.style.display = "none";
+}
+
+function setLoadingIcon(){
+    elementSpinner.style.display = "flex";
+}
+
+function configLoadingIcon(){
+    disableButton(elementSaveButton);
+    disableButton(elementBackButton);
+    hideProfileImages();
+
+    setLoadingIcon();
+}
 
 function saveProfileOnClick(){
     elementSaveButton.addEventListener('click', () => {
+        configLoadingIcon();
+
         const formData = new FormData();
         const attchment: File = elementAttach.files[0];
         formData.append('image', attchment);
@@ -124,7 +149,7 @@ function saveProfileOnClick(){
 
             
             setTimeout(() => { 
-                window.open("/perfil.html","_self");
+                window.open("/profile.html","_self");
             }, 8000)
          
         })

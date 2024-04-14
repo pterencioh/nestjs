@@ -75,12 +75,12 @@ function validateLogin() {
         }
         const user = response.jwt;
         checkRememberMe(user);
-        window.open("/perfil.html", "_self");
+        window.open("/profile.html", "_self");
     })
         .catch(error => console.log(error));
 }
 function checkLocalStorage() {
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
     if (token)
-        window.open("/perfil.html", "_self");
+        window.open("/profile.html", "_self");
 }

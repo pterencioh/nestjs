@@ -16,15 +16,7 @@ export class ProfilesService {
     );
   
     constructor(private readonly prismaService: PrismaService,
-       private readonly authService: AuthService) {
-      this.initializeDriveApi();
-    }
-  
-    private initializeDriveApi() {
-      this.oauth2Client.setCredentials({
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN
-      });
-    }
+       private readonly authService: AuthService) {  }
   
     async uploadFile(file: Express.Multer.File, jwt: string): Promise<string> {
       const verifyJWT:boolean = this.authService.verifyJWTtoken(jwt);
@@ -37,8 +29,19 @@ export class ProfilesService {
       if(!getUser)
         throw new HttpException("Invalid user information", 404);
 
+      // Configurar o cliente OAuth2 com suas credenciais
+      const auth = new google.auth.GoogleAuth({
+        keyFile: 'gifted-kit-397020-ef7c9e774d8e.json', // Arquivo de credenciais obtido no Console de Desenvolvedor do Google
+        scopes: ['https://www.googleapis.com/auth/drive'], // Escopos necessários para acessar o Google Drive
+      });
 
-      const drive = google.drive({ version: 'v3', auth: this.oauth2Client });
+      const authClient = await auth.getClient();
+        
+      // Criar uma instância do serviço Google Drive
+      const drive = google.drive({
+            version: 'v3',
+            auth: authClient as any,
+      });
   
       const fileMetadata = {
         name: file.filename,
@@ -61,6 +64,8 @@ export class ProfilesService {
         const updateUser = await this.updateProfileImage(getUser.id, fileContentLink);
         if(!updateUser)
                 throw new HttpException("Failed to update the current user", 400);
+
+        const deletePreviousImage = await this.deleteFile(decodeJWT);
 
         const newJWT = this.authService.generateJWTtoken(updateUser.id, updateUser.name,updateUser. email, updateUser.profile_image);
         return newJWT;
@@ -92,11 +97,22 @@ export class ProfilesService {
 
     }
 
-    async downloadFile(fileId: string){
+    async deleteFile(previousJWT: JWTPayload) : Promise<void> {
+        const isGoogleDriveUpload: boolean = previousJWT.profile_image.startsWith("https://drive.google.com/thumbnail?id=");
+        if(!isGoogleDriveUpload)
+            return
+
+        const defaultImages = JSON.parse(process.env.DEFAULT_PROFILE_IMAGES);
+        const fileId: string  = previousJWT.profile_image.replace(/^https:\/\/drive\.google\.com\/thumbnail\?id=/, '');
+
+        const isFileIdDefault: boolean = (defaultImages.filter((image: { [key: string]: string; }) => Object.values(image).includes(fileId))[0]);
+        if(isFileIdDefault)
+            return
+
         // Configurar o cliente OAuth2 com suas credenciais
         const auth = new google.auth.GoogleAuth({
             keyFile: 'gifted-kit-397020-ef7c9e774d8e.json', // Arquivo de credenciais obtido no Console de Desenvolvedor do Google
-            scopes: ['https://www.googleapis.com/auth/drive.readonly'], // Escopos necessários para acessar o Google Drive
+            scopes: ['https://www.googleapis.com/auth/drive'], // Escopos necessários para acessar o Google Drive
         });
         
         // Criar um cliente OAuth2
@@ -108,19 +124,11 @@ export class ProfilesService {
             auth: authClient as any,
         });
         
-        // Obter os metadados do arquivo
-        const { data: fileMetadata } = await drive.files.get({ fileId });
-        
-        // Verificar se o tipo MIME do arquivo é uma imagem
-        if (fileMetadata.mimeType.startsWith('image/')) {
-            // URL de visualização do conteúdo da imagem
-            const fileContentLink = `https://drive.google.com/uc?id=${fileMetadata.id}`;
-        
-            // Exibir a imagem em uma tag <img>
-            return fileContentLink;
-        } else {
-            console.log('O arquivo não é uma imagem.');
+        try {
+              const deleteFile = await drive.files.delete({ fileId });
+        } catch (error) {
+            throw new HttpException("Error: " + error, 500);
         }
     }
-  }
+}
   
